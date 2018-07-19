@@ -1,0 +1,24 @@
+<h1>{{ player.nickname }}</h1>
+
+{%  if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<ul>
+    <li>{{  player.first_name }} {{  player.last_name }}</li>
+    <li>{{ gender_line }}</li>
+    <li>{{  field_position }}</li>
+
+</ul>
+
+<h1>Events</h1>
+<ul>
+{% for event in event_list %}
+    <li>{{ event.name }}</li>
+{% endfor %}
+</ul>
+
+<h1>Events attending</h1>
+<ul>
+{% for event in player.event_set.all %}
+    <li>{{ event.name }}</li>
+{% endfor %}
+</ul>

@@ -30,12 +30,22 @@ class Event(models.Model):
     )
 
     type = models.CharField(max_length=20, choices=EVENT_TYPES)
-    event_name = models.CharField(max_length=30, default='')
-    date = models.DateField('tournament date')
+    name = models.CharField(max_length=30, default='')
+    date = models.DateField('Event date')
     attendees = models.ManyToManyField(Player)
 
     def __str__(self):
-        return self.event_name
+        return self.name
 
+class Attendance(models.Model):
+    player = models.ForeignKey(Player, on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
 
-
+    ATTENDANCE_TYPES = (
+        ('Y', 'Yes',),
+        ('N', 'No',),
+        ('U', 'Unsure',),
+        ('I', 'Injured',),
+        ('Y', 'Yes',),
+    )
+    status = models.CharField(max_length=1, choices=ATTENDANCE_TYPES)

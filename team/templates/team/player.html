@@ -1,3 +1,12 @@
+<head>
+<style>
+table, th, td {
+    border: 1px solid black;
+}
+</style>
+</head>
+
+
 <h1>{{ player.nickname }}</h1>
 
 {%  if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
@@ -8,6 +17,22 @@
     <li>{{  field_position }}</li>
 
 </ul>
+
+<h1>Events</h1>
+
+<table>
+    <tr>
+        {% for event in event_list %}
+            <td>{{ event.name }}</td>
+        {% endfor %}
+    </tr>
+    <tr>
+        {% for att in attendance %}
+            <td>{{ att }}</td>
+        {% endfor %}
+    </tr>
+
+</table>
 
 <h1>Events</h1>
 <ul>

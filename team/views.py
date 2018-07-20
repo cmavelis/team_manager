@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.views import generic
 from django.utils import timezone
 
-from .models import Player, Event
+from .models import Player, Event, Attendance
 
 
 class IndexView(generic.ListView):
@@ -18,14 +18,16 @@ class IndexView(generic.ListView):
 def player_view(request, player_nickname):
     player = get_object_or_404(Player, nickname=player_nickname)  # pk=player_id)
     event_list = Event.objects.all()
-    attendance = {}
+    attendance = []
     for event in event_list:
-        attendance
+        attendance.append(Attendance.objects.filter(player_id=player.id,
+                                                    event_id=event.id).get().get_status_display())
 
     context = {'event_list': event_list,
                'player': player,
                'gender_line': player.get_gender_line_display(),
                'field_position': player.get_field_position_display(),
+               'attendance': attendance,
                }
 
     return render(request, 'team/player.html', context)

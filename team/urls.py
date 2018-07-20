@@ -6,7 +6,7 @@ app_name = 'team'
 urlpatterns = [
     # team/
     path('', views.IndexView.as_view(), name='index'),
-    # team/3/
+    # team/Cam/
     path('<str:player_nickname>/', views.player_view, name='player'),
     # path('<slug:slug>/', views.PlayerView.as_view(), name='player'),
     # path('<int:pk>/', views.DetailView.as_view(), name='detail'),

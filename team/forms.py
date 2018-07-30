@@ -1,5 +1,8 @@
-from django import forms
+from django.forms import ModelForm
+from .models import Player
 
 
-class PersonalInfoForm(forms.Form):
-    nickname = forms.CharField(label='Nickname (will identify you on this site)', max_length=20)
+class PlayerForm(ModelForm):
+    class Meta:
+        model = Player
+        fields = '__all__'

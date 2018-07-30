@@ -5,7 +5,7 @@ from django.views import generic
 from django.utils import timezone
 
 from .models import Player, Event, Attendance
-from .forms import PersonalInfoForm
+from .forms import PlayerForm
 
 
 class IndexView(generic.ListView):
@@ -38,20 +38,22 @@ def player_view(request, player_nickname):
     return render(request, 'team/player.html', context)
 
 
-def get_nickname(request):
+def get_nickname(request, player_nickname):
     # if this is a POST request we need to process the form data
+    player = get_object_or_404(Player, nickname=player_nickname)
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = PersonalInfoForm(request.POST)
+        form = PlayerForm(request.POST, instance=player)
+
         # check whether it's valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
-            # ...
+            form.save()
             # redirect to a new URL:
             return HttpResponseRedirect('/thanks/')
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = PersonalInfoForm()
+        form = PlayerForm(instance=player)
 
     return render(request, 'nickname.html', {'form': form})
 

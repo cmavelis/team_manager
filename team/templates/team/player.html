@@ -34,6 +34,9 @@ table, th, td {
 
 </table>
 
+<a href="{% url 'team:info_edit' player.nickname %}">Edit your info</a>
+
+
 <h1>Events</h1>
 <ul>
 {% for event in event_list %}

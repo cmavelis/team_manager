@@ -18,7 +18,11 @@ table, th, td {
 
 </ul>
 
-<h1>Events</h1>
+<!--Link to edit player info-->
+<a href="{% url 'team:player_edit' player.nickname %}">Edit your info</a>
+
+
+<h2>Events</h2>
 
 <table>
     <tr>
@@ -34,17 +38,16 @@ table, th, td {
 
 </table>
 
-<a href="{% url 'team:info_edit' player.nickname %}">Edit your info</a>
+<!--Add link to edit event info-->
 
-
-<h1>Events</h1>
+<h2>Events</h2>
 <ul>
 {% for event in event_list %}
     <li>{{ event.name }}</li>
 {% endfor %}
 </ul>
 
-<h1>Events attending</h1>
+<h2>Events attending</h2>
 <ul>
 {% for event in player.event_set.all %}
     <li>{{ event.name }}</li>

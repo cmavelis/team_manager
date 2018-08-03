@@ -49,13 +49,13 @@ def get_nickname(request, player_nickname):
         if form.is_valid():
             # process the data in form.cleaned_data as required
             form.save()
-            # redirect to a new URL:
-            return HttpResponseRedirect('/thanks/')
+            # redirect to a new URL: #TODO is there a more django-way to make this url?
+            return HttpResponseRedirect('/team/'+player_nickname)
     # if a GET (or any other method) we'll create a blank form
     else:
         form = PlayerForm(instance=player)
 
-    return render(request, 'nickname.html', {'form': form})
+    return render(request, 'team/nickname.html', {'form': form})
 
 # def player_event_edit(request, player_nickname):
 

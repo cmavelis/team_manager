@@ -10,11 +10,20 @@ class PlayerAdmin(admin.ModelAdmin):
         ]
 
 
+class AttendeeInline(admin.TabularInline):
+    model = Event.attendees.through
+    verbose_name = u"Attendee"
+    verbose_name_plural = u"Attendees"
+
+
 class EventAdmin(admin.ModelAdmin):
     fieldsets = [
         (None,                  {'fields': ['name']}),
         ('Event Details',          {'fields': ['type', 'date',]}),# 'attendees']}),#
     ]
+    inlines = (
+        AttendeeInline,
+    )
 
 
 admin.site.register(Player, PlayerAdmin)

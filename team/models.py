@@ -24,12 +24,17 @@ class Player(models.Model):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     # Players will be identified by nickname throughout the model TODO: default nickname to first_name if not provided
-    nickname = models.CharField(max_length=30)
+    nickname = models.CharField(max_length=30, blank=True)
     gender_line = models.CharField(max_length=1, choices=GENDER_LINES)
     field_position = models.CharField(max_length=1, choices=FIELD_POSITIONS)
 
     def __str__(self):
         return self.nickname
+
+    def save(self, *args, **kwargs):
+        if getattr(self, 'nickname', None) is '':  # check that current instance has 'nickname' attribute left blank
+            self.nickname = self.first_name  # assign 'nickname' to be first name
+        super(Player, self).save(*args, **kwargs)  # Call the "real" save() method.
 
 
 class Event(models.Model):
@@ -56,11 +61,11 @@ class Attendance(models.Model):
 
     # possible responses for Players to fill out their attendance
     # TODO: differentiate No into Excused/Absent?
-    # TODO: default status Unsure?
     ATTENDANCE_TYPES = (
         ('Y', 'Yes',),
         ('N', 'No',),
         ('U', 'Unsure',),
         ('I', 'Injured',),
+        ('P', 'Pending response',),
     )
-    status = models.CharField(max_length=1, choices=ATTENDANCE_TYPES)
+    status = models.CharField(max_length=1, choices=ATTENDANCE_TYPES, default='P')

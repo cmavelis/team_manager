@@ -1,6 +1,21 @@
 from django.db import models
 
 
+class Event(models.Model):
+    # typical events for Ultimate teams -- may expand to include Practice, Social, Tryout, etc.
+    EVENT_TYPES = (
+        ('T', 'Tournament',),
+        ('S', 'Scrimmage',),
+    )
+
+    type = models.CharField(max_length=20, choices=EVENT_TYPES)
+    name = models.CharField(max_length=30, default='')
+    date = models.DateField('Event date')
+
+    def __str__(self):
+        return self.name
+
+
 class Player(models.Model):
     # for Mixed Ultimate, players must play in one of two categories, defined in current USAU rules as Men and Women.
     # Baltimore BENCH has expanded this definition to be more inclusive, focusing on behavior rather than identity.
@@ -28,6 +43,9 @@ class Player(models.Model):
     gender_line = models.CharField(max_length=1, choices=GENDER_LINES)
     field_position = models.CharField(max_length=1, choices=FIELD_POSITIONS)
 
+    # many-to-many relationship will be handled through the Attendance Class, a key component of this app
+    attending = models.ManyToManyField(Event, through='Attendance')
+
     def __str__(self):
         return self.nickname
 
@@ -35,23 +53,6 @@ class Player(models.Model):
         if getattr(self, 'nickname', None) is '':  # check that current instance has 'nickname' attribute left blank
             self.nickname = self.first_name  # assign 'nickname' to be first name
         super(Player, self).save(*args, **kwargs)  # Call the "real" save() method.
-
-
-class Event(models.Model):
-    # typical events for Ultimate teams -- may expand to include Practice, Social, Tryout, etc.
-    EVENT_TYPES = (
-        ('T', 'Tournament',),
-        ('S', 'Scrimmage',),
-    )
-
-    type = models.CharField(max_length=20, choices=EVENT_TYPES)
-    name = models.CharField(max_length=30, default='')
-    date = models.DateField('Event date')
-    # many-to-many relationship will be handled through the Attendance Class, a key component of this app
-    attendees = models.ManyToManyField(Player, through='Attendance')
-
-    def __str__(self):
-        return self.name
 
 
 class Attendance(models.Model):

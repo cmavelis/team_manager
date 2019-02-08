@@ -11,9 +11,9 @@ urlpatterns = [
     path('<str:player_nickname>/', views.player_view, name='player'),
 
     # team/Cam/player_edit/  user-facing individual summaries
-    path('<str:player_nickname>/player_edit/', views.get_nickname, name='player_edit'),
+    path('<str:player_nickname>/player_edit/', views.player_edit_info, name='player_edit'),
 
     # team/Cam/events  form to edit event attendance
-    path('<str:player_nickname>/attendance/', views.player_view, name='player_attendance'),
+    path('<str:player_nickname>/attendance/', views.player_edit_attendance, name='player_attendance'),
 
     ]

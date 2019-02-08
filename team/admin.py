@@ -3,17 +3,20 @@ from django.contrib import admin
 from .models import Player, Event
 
 
+class AttendeeInline(admin.TabularInline):
+    model = Player.attending.through
+    verbose_name = u"Attendance"
+    verbose_name_plural = u"Attendance"
+
+
 class PlayerAdmin(admin.ModelAdmin):
     fieldsets = [
         ('Personal Info',              {'fields': ['nickname', 'first_name', 'last_name']}),
         ('Frisbee Info',  {'fields': ['field_position', 'gender_line']}),
         ]
-
-
-class AttendeeInline(admin.TabularInline):
-    model = Event.attendees.through
-    verbose_name = u"Attendee"
-    verbose_name_plural = u"Attendees"
+    inlines = (
+        AttendeeInline,
+    )
 
 
 class EventAdmin(admin.ModelAdmin):
@@ -21,9 +24,6 @@ class EventAdmin(admin.ModelAdmin):
         (None,                  {'fields': ['name']}),
         ('Event Details',          {'fields': ['type', 'date',]}),# 'attendees']}),#
     ]
-    inlines = (
-        AttendeeInline,
-    )
 
 
 admin.site.register(Player, PlayerAdmin)

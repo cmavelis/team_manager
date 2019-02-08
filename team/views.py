@@ -5,7 +5,7 @@ from django.views import generic
 from django.utils import timezone
 
 from .models import Player, Event, Attendance
-from .forms import PlayerForm
+from .forms import PlayerForm, AttendanceForm
 
 
 class IndexView(generic.ListView):
@@ -24,25 +24,25 @@ def player_view(request, player_nickname):
     event_list = Event.objects.all()
     # Player's attendance, by Event
     attendance = []
-    for event in event_list:
-        try:
-            event_attendance = Attendance.objects.filter(player_id=player.id,
-                                                         event_id=event.id).get().get_status_display()
-        except Attendance.DoesNotExist:
-            raise Http404("Attendance object does not exist")
-        attendance.append(event_attendance)
+    # for event in event_list:
+    #     try:
+    #         event_attendance = Attendance.objects.filter(player_id=player.id,
+    #                                                      event_id=event.id).get().get_status_display()
+    #     except Attendance.DoesNotExist:
+    #         raise Http404("Attendance object does not exist")
+    #     attendance.append(event_attendance)
 
     context = {'event_list': event_list,
                'player': player,
                'gender_line': player.get_gender_line_display(),
                'field_position': player.get_field_position_display(),
-               'attendance': attendance,
+               # 'attendance': attendance,
                }
 
     return render(request, 'team/player.html', context)
 
 
-def get_nickname(request, player_nickname):
+def player_edit_info(request, player_nickname):
     # if this is a POST request we need to process the form data
     player = get_object_or_404(Player, nickname=player_nickname)
     if request.method == 'POST':
@@ -59,7 +59,27 @@ def get_nickname(request, player_nickname):
     else:
         form = PlayerForm(instance=player)
 
-    return render(request, 'team/nickname.html', {'form': form})
+    return render(request, 'team/player_info_form.html', {'form': form})
+
+
+def player_edit_attendance(request, player_nickname):
+    # if this is a POST request we need to process the form data
+    player = get_object_or_404(Player, nickname=player_nickname)
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = AttendanceForm(request.POST, instance=player)
+
+        # check whether it's valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            form.save()
+            # redirect to a new URL: #TODO is there a more django-way to make this url?
+            return HttpResponseRedirect('/team/'+player_nickname)
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = AttendanceForm()
+
+    return render(request, 'team/attendance_form.html', {'form': form})
 
 # def player_event_edit(request, player_nickname):
 

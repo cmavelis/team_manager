@@ -1,0 +1,9 @@
+{% load static %}
+<head>
+    <link rel="stylesheet" href="{% static "team/style.css" %}">
+</head>
+<form method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Submit" />
+</form>

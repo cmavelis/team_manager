@@ -1,4 +1,4 @@
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views import generic
@@ -25,8 +25,12 @@ def player_view(request, player_nickname):
     # Player's attendance, by Event
     attendance = []
     for event in event_list:
-        attendance.append(Attendance.objects.filter(player_id=player.id,
-                                                    event_id=event.id).get().get_status_display())
+        try:
+            event_attendance = Attendance.objects.filter(player_id=player.id,
+                                                         event_id=event.id).get().get_status_display()
+        except Attendance.DoesNotExist:
+            raise Http404("Attendance object does not exist")
+        attendance.append(event_attendance)
 
     context = {'event_list': event_list,
                'player': player,

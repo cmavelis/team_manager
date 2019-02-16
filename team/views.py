@@ -20,10 +20,17 @@ class IndexView(generic.ListView):
 def player_view(request, player_nickname):
     # relevant information for each Player to see on their page, leading to forms
     player = get_object_or_404(Player, nickname=player_nickname)  # pk=player_id)
-    # all Events
-    event_list = Event.objects.all()
+    # # all Events
+    # event_list = Event.objects.all()
     # Player's attendance, by Event
-    attendance = []
+    attendance_objects = player.attendance_set.all()
+    event_list = []
+    status_list = []
+    pair_list = []
+    for att in attendance_objects:
+        event_list.append(att.event)
+        status_list.append(att.status)
+        pair_list.append([att.event, att.status])
     # for event in event_list:
     #     try:
     #         event_attendance = Attendance.objects.filter(player_id=player.id,
@@ -36,7 +43,8 @@ def player_view(request, player_nickname):
                'player': player,
                'gender_line': player.get_gender_line_display(),
                'field_position': player.get_field_position_display(),
-               # 'attendance': attendance,
+               'attendance': status_list,
+               'pairs': pair_list,
                }
 
     return render(request, 'team/player.html', context)

@@ -70,13 +70,15 @@ def player_edit_info(request, player_nickname):
     return render(request, 'team/player_info_form.html', {'form': form})
 
 
-def player_edit_attendance(request, player_nickname):
+def player_edit_attendance(request, player_nickname, event_name):
     # if this is a POST request we need to process the form data
-    player = get_object_or_404(Player, nickname=player_nickname)
+    player = Player.objects.filter(nickname=player_nickname).get()
+    event = Event.objects.filter(name=event_name).get()
+    attendance = get_object_or_404(Attendance, event_id=event.id, player_id=player.id)
+
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = AttendanceForm(request.POST, instance=player)
-
+        form = AttendanceForm(request.POST, instance=attendance)
         # check whether it's valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
@@ -88,13 +90,6 @@ def player_edit_attendance(request, player_nickname):
         form = AttendanceForm()
 
     return render(request, 'team/attendance_form.html', {'form': form})
-
-# def player_event_edit(request, player_nickname):
-
-    # wait, should this just also use player_view, but a different template?
-    # don't know how to do this, unless subclassing
-    # This should probably be a form
-
 
 # class PlayerView(generic.DetailView):
 #     model = Player

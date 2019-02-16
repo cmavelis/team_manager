@@ -14,18 +14,9 @@ class PlayerForm(ModelForm):
                   ]
 
 
-# class AttendanceForm(ModelForm):
-#     class Meta:
-#         model = Attendance
-#         fields = ['status']
-#         widgets = {
-#             'attending': forms.RadioSelect(),
-#         }
-class AttendanceForm(forms.Form):
-    # class Meta:
-    #     model = Attendance
-    #     fields = ['status']
-    #     widgets = {
-    #         'attending': forms.RadioSelect(),
-    #     }
-    attending = Event.objects.all()
+class AttendanceForm(ModelForm):
+    class Meta:
+        model = Attendance
+        fields = ['status',
+                  ]
+        widgets = {'status': forms.RadioSelect}

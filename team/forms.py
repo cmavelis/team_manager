@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Player, Attendance
+from .models import Player, Attendance, Event
 
 
 class PlayerForm(ModelForm):
@@ -17,7 +17,6 @@ class PlayerForm(ModelForm):
 class AttendanceForm(ModelForm):
     class Meta:
         model = Attendance
-        fields = ['status']
-        widgets = {
-            'attending': forms.RadioSelect(),
-        }
+        fields = ['status',
+                  ]
+        widgets = {'status': forms.RadioSelect}

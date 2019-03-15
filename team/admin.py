@@ -1,6 +1,7 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
 
-from .models import Player, Event
+from .models import Player, Event, User
 
 
 class AttendeeInline(admin.TabularInline):
@@ -22,10 +23,11 @@ class PlayerAdmin(admin.ModelAdmin):
 class EventAdmin(admin.ModelAdmin):
     fieldsets = [
         (None,                  {'fields': ['name']}),
-        ('Event Details',          {'fields': ['type', 'date',]}),# 'attendees']}),#
+        ('Event Details',          {'fields': ['type', 'date', ]}),
     ]
 
 
+admin.site.register(User, UserAdmin)
 admin.site.register(Player, PlayerAdmin)
 admin.site.register(Event, EventAdmin)
 

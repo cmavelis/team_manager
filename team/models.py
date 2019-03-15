@@ -1,4 +1,12 @@
 from django.db import models
+from django.conf import settings
+from django.contrib.auth.models import AbstractUser
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+
+class User(AbstractUser):
+    pass
 
 
 class Event(models.Model):
@@ -53,6 +61,20 @@ class Player(models.Model):
         if getattr(self, 'nickname', None) is '':  # check that current instance has 'nickname' attribute left blank
             self.nickname = self.first_name  # assign 'nickname' to be first name
         super(Player, self).save(*args, **kwargs)  # Call the "real" save() method.
+
+    # link the django user
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_player(sender, instance, created, **kwargs):
+    if created:
+        Player.objects.create(user=instance)
+
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def save_player(sender, instance, **kwargs):
+    instance.player.save()
 
 
 class Attendance(models.Model):

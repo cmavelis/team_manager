@@ -81,17 +81,3 @@ def player_edit_attendance(request, player_nickname):
 
     return render(request, 'team/attendance_form.html', {'form': form})
 
-# def player_event_edit(request, player_nickname):
-
-    # wait, should this just also use player_view, but a different template?
-    # don't know how to do this, unless subclassing
-    # This should probably be a form
-
-
-# class PlayerView(generic.DetailView):
-#     model = Player
-#     template_name = 'team/player.html'
-#     slug_field = 'nickname'
-#
-#     def show_events(self):
-

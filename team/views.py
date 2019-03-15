@@ -91,6 +91,28 @@ def player_edit_attendance(request, player_nickname, event_name):
 
     return render(request, 'team/attendance_form.html', {'form': form})
 
+
+def full_team_view(request):
+    # all Events, in order of date
+    event_list = Event.objects.all().order_by('date')
+    # Player's attendance, by Event
+    players_info = []
+    for player in Player.objects.all():
+        new_entry = [player.nickname]
+        attendance = player.attendance_set.all()
+        for event in event_list:
+            try:
+                new_entry.append(attendance.get(event=event.id).status)
+            except Attendance.DoesNotExist:
+                new_entry.append('ERR')
+        players_info.append(new_entry)
+
+    context = {'event_list': event_list,
+               'players_info': players_info,
+               }
+
+    return render(request, 'team/captain_summary.html', context)
+
 # class PlayerView(generic.DetailView):
 #     model = Player
 #     template_name = 'team/player.html'

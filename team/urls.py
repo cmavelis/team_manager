@@ -7,6 +7,9 @@ urlpatterns = [
     # team/  navigation page for all team stuff, user-facing
     path('', views.IndexView.as_view(), name='index'),
 
+    # team/captain/  summary of whole team attendance
+    path('captain/', views.full_team_view, name='captain'),
+
     # team/Cam/  user-facing individual summaries
     path('<str:player_nickname>/', views.player_view, name='player'),
 

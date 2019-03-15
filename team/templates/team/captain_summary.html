@@ -1,0 +1,27 @@
+<head>
+<style>
+table, th, td {
+    border: 1px solid black;
+}
+</style>
+</head>
+
+
+<h1>Whole Team Event Attendance</h1>
+
+<table>
+    <tr>
+        <td></td>
+    {% for event in event_list %}
+        <td>{{ event }}</td>
+    {% endfor %}
+    </tr>
+    {% for item in players_info %}
+    <tr>
+        {% for detail in item %}
+            <td>{{ detail }}</td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+
+</table>

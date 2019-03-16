@@ -11,8 +11,9 @@ class AttendeeInline(admin.TabularInline):
 
 
 class PlayerAdmin(admin.ModelAdmin):
+    list_display = ('nickname', 'user')
     fieldsets = [
-        ('Personal Info',              {'fields': ['nickname', 'first_name', 'last_name']}),
+        ('Personal Info',              {'fields': ['nickname', 'first_name', 'last_name', 'user']}),
         ('Frisbee Info',  {'fields': ['field_position', 'gender_line']}),
         ]
     inlines = (
@@ -27,7 +28,6 @@ class EventAdmin(admin.ModelAdmin):
     ]
 
 
-admin.site.register(User, UserAdmin) # TODO: add a display for associated Player/User, vice versa
+admin.site.register(User, UserAdmin)  # TODO: add a display for associated Player/User, vice versa
 admin.site.register(Player, PlayerAdmin)
 admin.site.register(Event, EventAdmin)
-

@@ -44,8 +44,8 @@ class Player(models.Model):
     )
 
     # all the personal and Ultimate-related info we want to store
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=30)
+    first_name = models.CharField(max_length=30)  # TODO: phase name out from Player, store in User
+    last_name = models.CharField(max_length=30)  # TODO: or just reference the User fields here?
     # Players will be identified by nickname throughout the model
     nickname = models.CharField(max_length=30, blank=True)
     gender_line = models.CharField(max_length=1, choices=GENDER_LINES)
@@ -59,7 +59,7 @@ class Player(models.Model):
 
     def save(self, *args, **kwargs):
         if getattr(self, 'nickname', None) is '':  # check that current instance has 'nickname' attribute left blank
-            self.nickname = self.first_name  # assign 'nickname' to be first name
+            self.nickname = self.user.get_full_name()  # assign 'nickname' to be first name
         super(Player, self).save(*args, **kwargs)  # Call the "real" save() method.
 
     # link the django user
@@ -69,12 +69,23 @@ class Player(models.Model):
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_player(sender, instance, created, **kwargs):
     if created:
-        Player.objects.create(user=instance)
+        Player.objects.create(
+            user=instance,
+            # first_name=instance.first_name,
+            # last_name=instance.last_name,
+        )
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def save_player(sender, instance, **kwargs):
-    instance.player.save()
+    try:
+        instance.player.save()
+    except Player.DoesNotExist:
+        Player.objects.create(
+            user=instance,
+            # first_name=instance.first_name,
+            # last_name=instance.last_name,
+        )
 
 
 class Attendance(models.Model):

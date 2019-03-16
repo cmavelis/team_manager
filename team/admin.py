@@ -27,7 +27,7 @@ class EventAdmin(admin.ModelAdmin):
     ]
 
 
-admin.site.register(User, UserAdmin)
+admin.site.register(User, UserAdmin) # TODO: add a display for associated Player/User, vice versa
 admin.site.register(Player, PlayerAdmin)
 admin.site.register(Event, EventAdmin)
 

@@ -61,8 +61,8 @@ def player_edit_info(request, player_nickname):
         if form.is_valid():
             # process the data in form.cleaned_data as required
             form.save()
-            # redirect to a new URL: #TODO is there a more django-way to make this url?
-            return HttpResponseRedirect('/team/'+player_nickname)
+            # redirect to a new URL
+            return HttpResponseRedirect(reverse('team:player', kwargs={'player_nickname': player_nickname}))
     # if a GET (or any other method) we'll create a blank form
     else:
         form = PlayerForm(instance=player)
@@ -84,7 +84,7 @@ def player_edit_attendance(request, player_nickname, event_name):
             # process the data in form.cleaned_data as required
             form.save()
             # redirect to a new URL: #TODO is there a more django-way to make this url?
-            return HttpResponseRedirect('/team/'+player_nickname)
+            return HttpResponseRedirect(reverse('team:player', kwargs={'player_nickname': player_nickname}))
     # if a GET (or any other method) we'll create a blank form
     else:
         form = AttendanceForm()

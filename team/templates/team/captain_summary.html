@@ -1,12 +1,6 @@
-<head>
-<style>
-table, th, td {
-    border: 1px solid black;
-}
-</style>
-</head>
+{% extends "team/base.html" %}
 
-
+{% block content %}
 <h1>Whole Team Event Attendance</h1>
 
 <table>
@@ -25,3 +19,6 @@ table, th, td {
     {% endfor %}
 
 </table>
+
+<input type="button" value="Go Back" onclick="history.go(-1);" />
+{% endblock %}

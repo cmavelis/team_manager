@@ -1,12 +1,6 @@
-<head>
-<style>
-table, th, td {
-    border: 1px solid black;
-}
-</style>
-</head>
+{% extends "team/base.html" %}
 
-
+{% block content %}
 <h1>{{ player.nickname }}</h1>
 
 {%  if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
@@ -34,6 +28,7 @@ table, th, td {
     {% endfor %}
 
 </table>
+{% endblock %}
 
 <!--Add link to edit event info-->
 {#<a href="{% url 'team:player_attendance' player.nickname %}">Edit your attendance</a>#}

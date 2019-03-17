@@ -3,3 +3,7 @@ form {
     flex-direction: column;
     max-width: 12rem;
 }
+
+table, th, td {
+    border: 1px solid black;
+}

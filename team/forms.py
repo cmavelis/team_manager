@@ -1,6 +1,7 @@
 from django import forms
+from django.contrib.auth.forms import UserCreationForm
 from django.forms import ModelForm
-from .models import Player, Attendance
+from .models import Player, Attendance, User
 
 
 class PlayerForm(ModelForm):
@@ -21,3 +22,11 @@ class AttendanceForm(ModelForm):
         widgets = {
             'attending': forms.RadioSelect(),
         }
+
+
+class SignUpForm(UserCreationForm):
+    birth_date = forms.DateField(help_text='Required. Format: YYYY-MM-DD')
+
+    class Meta:
+        model = User
+        fields = ('username', 'birth_date', 'password1', 'password2',)

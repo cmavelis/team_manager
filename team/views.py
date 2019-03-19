@@ -1,12 +1,12 @@
 from django.contrib.auth import login, authenticate
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 from django.views import generic
 from django.utils import timezone
 
 from .models import Player, Event, Attendance
-from .forms import PlayerForm, AttendanceForm
+from .forms import PlayerForm, AttendanceForm, SignUpForm
 
 
 class IndexView(generic.ListView):
@@ -87,14 +87,14 @@ def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid:
-            user = form.save()
-            user.refresh_from_db()  # load the profile instance created by the signal
-            user.profile.birth_date = form.cleaned_data.get('birth_date')
-            user.save()
+            form.save()
+            # user.refresh_from_db()  # load the profile instance created by the signal
+            # user.profile.birth_date = form.cleaned_data.get('birth_date')
+            username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password1')
-            user = authenticate(username=user.username, password=raw_password)
+            user = authenticate(username=username, password=raw_password)
             login(request, user)
-            return redirect('home')
-        else:
-            form = SignUpForm()
-        return render(request, 'signup.html', {'form': form})
+            return redirect('team:index')
+    else:
+        form = SignUpForm()
+    return render(request, 'team/signup.html', {'form': form})

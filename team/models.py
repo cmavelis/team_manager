@@ -59,11 +59,11 @@ class Player(models.Model):
 
     def save(self, *args, **kwargs):
         if getattr(self, 'nickname', None) is '':  # check that current instance has 'nickname' attribute left blank
-            self.nickname = self.user.get_full_name()  # assign 'nickname' to be first name
+            self.nickname = self.user.get_full_name()  # assign 'nickname' to be full name
         super(Player, self).save(*args, **kwargs)  # Call the "real" save() method.
 
     # link the django user
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)

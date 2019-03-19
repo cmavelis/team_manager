@@ -7,6 +7,9 @@ urlpatterns = [
     # team/  navigation page for all team stuff, user-facing
     path('', views.IndexView.as_view(), name='index'),
 
+    # team/signup  signup form
+    path('signup/', views.signup, name='signup'),
+
     # team/player/Cam/  user-facing individual summaries
     path('player/<str:player_nickname>/', views.player_view, name='player'),
 

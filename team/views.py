@@ -24,9 +24,8 @@ class IndexView(generic.ListView):
 def player_view(request, player_nickname=None):
     # relevant information for each Player to see on their page, leading to forms
     if not player_nickname:
-        player = request.user
-    else:
-        player = get_object_or_404(Player, nickname=player_nickname)  # pk=player_id)
+        player_nickname = request.user.player.nickname
+    player = get_object_or_404(Player, nickname=player_nickname)  # pk=player_id)
     # # all Events
     # event_list = Event.objects.all()
     # Player's attendance, by Event

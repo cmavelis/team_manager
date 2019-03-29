@@ -14,7 +14,7 @@ urlpatterns = [
     path('captain/', views.full_team_view, name='captain'),
 
     # team/player/my_info/  user-facing individual summaries
-    path('player/my_info/', views.player_edit_info, name='self_edit'),
+    path('player/my_info/', views.player_view, name='self_edit'),
 
     # team/player/Cam/  user-facing individual summaries
     path('player/<str:player_nickname>/', views.player_view, name='player'),

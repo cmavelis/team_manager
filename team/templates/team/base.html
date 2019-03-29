@@ -1,11 +1,13 @@
 {% load static %}
 <head>
     <link rel="stylesheet" href="{% static 'team/style.css' %}">
+    <link rel="shortcut icon" href="{% static 'team/favicon.ico' %}" />
 </head>
 
 <h1>Baltimore Bench</h1>
 
 <a href="{% url 'team:index' %}">Home</a>
+<a href="{% url 'team:self_edit' %}">Edit my info</a>
 
 
 <div id="content">

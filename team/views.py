@@ -83,6 +83,11 @@ def player_edit_attendance(request, player_nickname):
     return render(request, 'team/attendance_form.html', {'form': form})
 
 
+def redirect_to_signup(request):
+    response = redirect('/team/signup/')
+    return response
+
+
 def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)

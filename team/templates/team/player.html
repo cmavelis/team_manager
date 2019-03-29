@@ -1,12 +1,6 @@
-<head>
-<style>
-table, th, td {
-    border: 1px solid black;
-}
-</style>
-</head>
+{% extends "team/base.html" %}
 
-
+{% block content %}
 <h1>{{ player.nickname }}</h1>
 
 {%  if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
@@ -22,34 +16,19 @@ table, th, td {
 <a href="{% url 'team:player_edit' player.nickname %}">Edit your info</a>
 
 
-<h2>Events</h2>
+<h2>Event Attendance</h2>
 
 <table>
+    {% for item in pairs %}
     <tr>
-        {% for event in event_list %}
-            <td>{{ event.name }}</td>
-        {% endfor %}
+        <td>{{ item.0 }}</td>
+        <td>{{ item.1 }}</td>
+        <td><a href="{% url 'team:player_attendance' player.nickname item.0.name %}">Edit your attendance</a></td>
     </tr>
-    <tr>
-        {% for att in attendance %}
-            <td>{{ att }}</td>
-        {% endfor %}
-    </tr>
+    {% endfor %}
 
 </table>
+{% endblock %}
 
 <!--Add link to edit event info-->
-
-<h2>Events</h2>
-<ul>
-{% for event in event_list %}
-    <li>{{ event.name }}</li>
-{% endfor %}
-</ul>
-
-<h2>Events attending</h2>
-<ul>
-{% for event in player.event_set.all %}
-    <li>{{ event.name }}</li>
-{% endfor %}
-</ul>
+{#<a href="{% url 'team:player_attendance' player.nickname %}">Edit your attendance</a>#}

@@ -21,10 +21,17 @@ class IndexView(generic.ListView):
 def player_view(request, player_nickname):
     # relevant information for each Player to see on their page, leading to forms
     player = get_object_or_404(Player, nickname=player_nickname)  # pk=player_id)
-    # all Events
-    event_list = Event.objects.all()
+    # # all Events
+    # event_list = Event.objects.all()
     # Player's attendance, by Event
-    attendance = []
+    attendance_objects = player.attendance_set.all()
+    event_list = []
+    status_list = []
+    pair_list = []
+    for att in attendance_objects:
+        event_list.append(att.event)
+        status_list.append(att.status)
+        pair_list.append([att.event, att.status])
     # for event in event_list:
     #     try:
     #         event_attendance = Attendance.objects.filter(player_id=player.id,
@@ -37,7 +44,8 @@ def player_view(request, player_nickname):
                'player': player,
                'gender_line': player.get_gender_line_display(),
                'field_position': player.get_field_position_display(),
-               # 'attendance': attendance,
+               'attendance': status_list,
+               'pairs': pair_list,
                }
 
     return render(request, 'team/player.html', context)
@@ -54,8 +62,8 @@ def player_edit_info(request, player_nickname):
         if form.is_valid():
             # process the data in form.cleaned_data as required
             form.save()
-            # redirect to a new URL: #TODO is there a more django-way to make this url?
-            return HttpResponseRedirect('/team/player/'+player_nickname)
+            # redirect to a new URL
+            return HttpResponseRedirect(reverse('team:player', kwargs={'player_nickname': player_nickname}))
     # if a GET (or any other method) we'll create a blank form
     else:
         form = PlayerForm(instance=player)
@@ -63,19 +71,21 @@ def player_edit_info(request, player_nickname):
     return render(request, 'team/player_info_form.html', {'form': form})
 
 
-def player_edit_attendance(request, player_nickname):
+def player_edit_attendance(request, player_nickname, event_name):
     # if this is a POST request we need to process the form data
-    player = get_object_or_404(Player, nickname=player_nickname)
+    player = Player.objects.filter(nickname=player_nickname).get()
+    event = Event.objects.filter(name=event_name).get()
+    attendance = get_object_or_404(Attendance, event_id=event.id, player_id=player.id)
+
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = AttendanceForm(request.POST, instance=player)
-
+        form = AttendanceForm(request.POST, instance=attendance)
         # check whether it's valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
             form.save()
-            # redirect to a new URL: #TODO is there a more django-way to make this url?
-            return HttpResponseRedirect('/team/player/'+player_nickname)
+            # redirect to a new URL:
+            return HttpResponseRedirect(reverse('team:player', kwargs={'player_nickname': player_nickname}))
     # if a GET (or any other method) we'll create a blank form
     else:
         form = AttendanceForm()
@@ -86,6 +96,28 @@ def player_edit_attendance(request, player_nickname):
 def redirect_to_signup(request):
     response = redirect('/team/signup/')
     return response
+
+
+def full_team_view(request):
+    # all Events, in order of date
+    event_list = Event.objects.all().order_by('date')
+    # Player's attendance, by Event
+    players_info = []
+    for player in Player.objects.all():
+        new_entry = [player.nickname]
+        attendance = player.attendance_set.all()
+        for event in event_list:
+            try:
+                new_entry.append(attendance.get(event=event.id).status)
+            except Attendance.DoesNotExist:
+                new_entry.append('ERR')
+        players_info.append(new_entry)
+
+    context = {'event_list': event_list,
+               'players_info': players_info,
+               }
+
+    return render(request, 'team/captain_summary.html', context)
 
 
 def signup(request):

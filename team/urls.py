@@ -10,13 +10,18 @@ urlpatterns = [
     # team/signup  signup form
     path('signup/', views.signup, name='signup'),
 
+    # team/captain/  summary of whole team attendance
+    path('captain/', views.full_team_view, name='captain'),
+
+    # team/Cam/  user-facing individual summaries
+    path('<str:player_nickname>/', views.player_view, name='player'),
+
     # team/player/Cam/  user-facing individual summaries
     path('player/<str:player_nickname>/', views.player_view, name='player'),
 
     # team/player/Cam/player_edit/  user-facing individual summaries
     path('player/<str:player_nickname>/player_edit/', views.player_edit_info, name='player_edit'),
 
-    # team/player/Cam/events  form to edit event attendance
-    path('player/<str:player_nickname>/attendance/', views.player_edit_attendance, name='player_attendance'),
-
+    # team/player/Cam/attendance/EVENT  form to edit event attendance
+    path('player/<str:player_nickname>/attendance/<str:event_name>', views.player_edit_attendance, name='player_attendance'),
     ]

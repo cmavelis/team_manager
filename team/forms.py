@@ -18,10 +18,9 @@ class PlayerForm(ModelForm):
 class AttendanceForm(ModelForm):
     class Meta:
         model = Attendance
-        fields = ['status']
-        widgets = {
-            'attending': forms.RadioSelect(),
-        }
+        fields = ['status',
+                  ]
+        widgets = {'status': forms.RadioSelect}
 
 
 class SignUpForm(UserCreationForm):

@@ -1,0 +1,11 @@
+[
+  {
+    "model": "team.User",
+    "pk": 1,
+    "fields": {
+      "username": "admin",
+      "password": "pbkdf2_sha256$100000$DxPYpgtoFex1$IKgj7tDbWkgSS3b3BAtBz5pTYca0ggjQo/2kDXux47c=",
+      "is_superuser": "True"
+    }
+  }
+]

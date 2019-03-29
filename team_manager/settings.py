@@ -26,7 +26,7 @@ SECRET_KEY = 'SECRET'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
@@ -84,6 +84,8 @@ DATABASES = {
     }
 }
 
+
+AUTH_USER_MODEL = 'team.User'
 
 # LOGGING CONFIGURATION
 # ------------------------------------------------------------------------------

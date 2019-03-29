@@ -1,4 +1,6 @@
 from django.contrib.auth import login, authenticate
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
@@ -18,9 +20,13 @@ class IndexView(generic.ListView):
         return Player.objects.order_by('-gender_line')
 
 
-def player_view(request, player_nickname):
+@login_required
+def player_view(request, player_nickname=None):
     # relevant information for each Player to see on their page, leading to forms
-    player = get_object_or_404(Player, nickname=player_nickname)  # pk=player_id)
+    if not player_nickname:
+        player = request.user
+    else:
+        player = get_object_or_404(Player, nickname=player_nickname)  # pk=player_id)
     # # all Events
     # event_list = Event.objects.all()
     # Player's attendance, by Event
@@ -51,6 +57,7 @@ def player_view(request, player_nickname):
     return render(request, 'team/player.html', context)
 
 
+@login_required
 def player_edit_info(request, player_nickname):
     # if this is a POST request we need to process the form data
     player = get_object_or_404(Player, nickname=player_nickname)
@@ -63,7 +70,7 @@ def player_edit_info(request, player_nickname):
             # process the data in form.cleaned_data as required
             form.save()
             # redirect to a new URL
-            return HttpResponseRedirect(reverse('team:player', kwargs={'player_nickname': player_nickname}))
+            return HttpResponseRedirect(reverse('team:player', kwargs={'player_nickname': player.nickname}))
     # if a GET (or any other method) we'll create a blank form
     else:
         form = PlayerForm(instance=player)
@@ -71,6 +78,7 @@ def player_edit_info(request, player_nickname):
     return render(request, 'team/player_info_form.html', {'form': form})
 
 
+@login_required
 def player_edit_attendance(request, player_nickname, event_name):
     # if this is a POST request we need to process the form data
     player = Player.objects.filter(nickname=player_nickname).get()
@@ -98,6 +106,12 @@ def redirect_to_signup(request):
     return response
 
 
+def redirect_to_login(request):
+    response = redirect('/account/login/')
+    return response
+
+
+@login_required
 def full_team_view(request):
     # all Events, in order of date
     event_list = Event.objects.all().order_by('date')

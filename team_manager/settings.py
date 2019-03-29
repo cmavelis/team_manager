@@ -87,6 +87,9 @@ DATABASES = {
 
 AUTH_USER_MODEL = 'team.User'
 
+# Redirect to home URL after login (Default redirects to /accounts/profile/)
+LOGIN_REDIRECT_URL = '/team/'
+
 # LOGGING CONFIGURATION
 # ------------------------------------------------------------------------------
 LOGGING = {

@@ -106,7 +106,7 @@ def redirect_to_signup(request):
 
 
 def redirect_to_login(request):
-    response = redirect('/account/login/')
+    response = redirect('/accounts/login/')
     return response
 
 

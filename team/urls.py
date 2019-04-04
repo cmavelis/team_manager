@@ -25,6 +25,6 @@ urlpatterns = [
     # team/player/Cam/attendance/EVENT  form to edit event attendance
     path('player/<str:player_nickname>/attendance/<str:event_name>', views.player_edit_attendance, name='player_attendance'),
 
-    # team/slack/test  slack test message
-    path('slack/test', views.slack_test, name='slack_test'),
+    # team/slack/test/  slack test message
+    path('slack/test/', views.slack_test, name='slack_test'),
 ]

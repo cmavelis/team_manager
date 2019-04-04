@@ -1,11 +1,12 @@
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 from django.views import generic
 from django.utils import timezone
+
 
 from .models import Player, Event, Attendance
 from .forms import PlayerForm, AttendanceForm, SignUpForm
@@ -148,3 +149,17 @@ def signup(request):
     else:
         form = SignUpForm()
     return render(request, 'team/signup.html', {'form': form})
+
+
+def slack_test(request):
+    if request.command == '/weather':
+        response = {
+            'text': 'Hi',
+            'attachments': [
+                {
+                    'text': 'Sent by {}'.format(request.user_name)
+                }
+            ]
+        }
+
+        return JsonResponse(response)

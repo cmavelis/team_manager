@@ -139,7 +139,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    '.slack.com'
+    'https://api.slack.com'
 ]
 
 # Internationalization

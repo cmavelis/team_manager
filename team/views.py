@@ -1,11 +1,10 @@
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 from django.views import generic
-from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 
 
@@ -151,22 +150,3 @@ def signup(request):
         form = SignUpForm()
     return render(request, 'team/signup.html', {'form': form})
 
-
-@csrf_exempt
-def slack_test(request):
-    if request.method == 'POST':
-        payload = request.POST
-    else:
-        return Http404
-    print(payload)
-    if payload['command'] == '/test_hi':
-        response = {
-            'text': 'Hi',
-            'attachments': [
-                {
-                    'text': 'Sent by {}'.format(payload['user_name'])
-                }
-            ]
-        }
-
-        return JsonResponse(response)

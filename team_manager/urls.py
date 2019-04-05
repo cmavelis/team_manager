@@ -21,5 +21,6 @@ urlpatterns = [
     path('', redirect_to_login),
     path('accounts/', include('django.contrib.auth.urls')),
     path('team/', include('team.urls'), name='TEAM'),
+    path('slack/', include('slack_integration.urls'), name='SLACK'),
     path('admin/', admin.site.urls),
 ]

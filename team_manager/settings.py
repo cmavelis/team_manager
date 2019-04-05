@@ -33,6 +33,7 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 INSTALLED_APPS = [
     'team',
+    'slack_integration',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

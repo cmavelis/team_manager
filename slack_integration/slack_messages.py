@@ -1,4 +1,4 @@
-create_event = [
+create_event = {[
 	{
 		"type": "section",
 		"text": {
@@ -64,3 +64,4 @@ create_event = [
 		}
 	}
 ]
+}

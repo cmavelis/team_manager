@@ -14,6 +14,7 @@ class Event(models.Model):
     EVENT_TYPES = (
         ('T', 'Tournament',),
         ('S', 'Scrimmage',),
+        ('O', 'Other',),
     )
 
     type = models.CharField(max_length=20, choices=EVENT_TYPES)

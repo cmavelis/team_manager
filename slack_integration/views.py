@@ -103,7 +103,7 @@ def slack_my_events(request):
         attendance_entries = []
         for event in event_list:
             try:
-                attendance_entries.append(attendance.get(event=event.id).status)
+                attendance_entries.append(attendance.get(event=event.id).get_status_display())
             except Attendance.DoesNotExist:
                 attendance_entries.append('ERR')
 

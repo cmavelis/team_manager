@@ -11,7 +11,7 @@ class AttendeeInline(admin.TabularInline):
 
 
 class PlayerAdmin(admin.ModelAdmin):
-    list_display = ('nickname', 'user')
+    list_display = ('nickname', 'user', 'slack_user_id')
     fieldsets = [
         ('Personal Info', {'fields': ['nickname', 'first_name', 'last_name', 'user', 'slack_user_id']}),
         ('Frisbee Info',  {'fields': ['field_position', 'gender_line']}),

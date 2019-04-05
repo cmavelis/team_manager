@@ -3,7 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonResponse
 from django.utils import timezone
 
-from team.models import Event, Player
+from team.models import Event, Player, Attendance
 
 
 @csrf_exempt
@@ -80,6 +80,48 @@ def slack_register(request):
                     }
                 ]
             }
+
+        return JsonResponse(response)
+
+    else:
+        return Http404
+
+
+@csrf_exempt
+def slack_my_events(request):
+    if request.method == 'POST':
+        payload = request.POST
+    else:
+        return Http404
+
+    if payload['command'] == '/my_events':
+        slack_user_id = payload['user_id']
+        found_player = get_object_or_404(Player, slack_user_id=slack_user_id)
+
+        event_list = Event.objects.all().order_by('date')
+        attendance = found_player.attendance_set.all()
+        attendance_entries = []
+        for event in event_list:
+            try:
+                attendance_entries.append(attendance.get(event=event.id).status)
+            except Attendance.DoesNotExist:
+                attendance_entries.append('ERR')
+
+        to_display = zip(event_list, attendance_entries)
+
+        event_message = '*Event: Response*'
+        for pair in to_display:
+            pair_as_string = '\n%s: %s' % (pair[:])
+            event_message += pair_as_string
+
+        response = {
+            'text': 'Your event responses:',
+            'attachments': [
+                {
+                    'text': event_message
+                }
+            ]
+        }
 
         return JsonResponse(response)
 

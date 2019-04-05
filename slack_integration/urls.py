@@ -8,5 +8,8 @@ urlpatterns = [
     path('test/', views.slack_test, name='slack_test'),
 
     # slack/create_event/  create an event from slack
-    path('create_event/', views.slack_create_event, name='slack_create_event')
+    path('create_event/', views.slack_create_event, name='slack_create_event'),
+
+    # slack/register/  register slack user id to webapp account
+    path('register/', views.slack_register, name='slack_register')
 ]

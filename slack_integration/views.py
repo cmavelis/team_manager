@@ -58,7 +58,9 @@ def slack_register(request):
     print(payload)
     if payload['command'] == '/webapp_register':
         nickname = payload['text']
+        print(nickname)
         found_player = get_object_or_404(Player, nickname=nickname)
+        print(found_player)
 
         if not found_player.slack_user_id:
             found_player.slack_user_id = payload['user_id']

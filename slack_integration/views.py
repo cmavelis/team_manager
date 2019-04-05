@@ -47,7 +47,7 @@ def slack_create_event(request):
             ]
         }
 
-        return JsonResponse(create_event)
+        return JsonResponse(create_event, safe=False)
 
 
 @csrf_exempt

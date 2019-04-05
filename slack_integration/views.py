@@ -96,7 +96,13 @@ def slack_my_events(request):
 
     if payload['command'] == '/my_events':
         slack_user_id = payload['user_id']
-        found_player = get_object_or_404(Player, slack_user_id=slack_user_id)
+        try:
+            found_player = Player.objects.get(slack_user_id=slack_user_id)
+        except Player.DoesNotExist:
+            return JsonResponse({
+                'text': 'Your Webapp account wasn\'t found.  '
+                        'Have you registered your Slack ID yet? Use /register [webapp nickname]',
+            })
 
         event_list = Event.objects.all().order_by('date')
         attendance = found_player.attendance_set.all()

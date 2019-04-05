@@ -65,6 +65,9 @@ class Player(models.Model):
     # link the django user
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
+    # link the slack account user_id
+    slack_user_id = models.CharField(max_length=30, blank=True)
+
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_player(sender, instance, created, **kwargs):

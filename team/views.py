@@ -154,8 +154,12 @@ def signup(request):
 
 @csrf_exempt
 def slack_test(request):
-    print(request)
-    if request.command == '/weather':
+    if request.method == 'POST':
+        payload = request.POST
+    else:
+        return Http404
+    print(payload)
+    if payload.command == '/weather':
         response = {
             'text': 'Hi',
             'attachments': [

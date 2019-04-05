@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonResponse
+from django.utils import timezone
 
 from team.models import Event
 
@@ -34,7 +35,7 @@ def slack_create_event(request):
     print(payload)
     if payload['command'] == '/create_event':
         event_name = payload['text']
-        Event.objects.create(name=event_name, type='T')
+        Event.objects.create(name=event_name, type='T', date=timezone.now())
 
         response = {
             'text': 'Your event has been created',

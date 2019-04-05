@@ -159,12 +159,12 @@ def slack_test(request):
     else:
         return Http404
     print(payload)
-    if payload.command == '/weather':
+    if payload['command'] == '/test_hi':
         response = {
             'text': 'Hi',
             'attachments': [
                 {
-                    'text': 'Sent by {}'.format(request.user_name)
+                    'text': 'Sent by {}'.format(payload['user_name'])
                 }
             ]
         }

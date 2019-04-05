@@ -139,8 +139,16 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://api.slack.com'
+    'api.slack.com'
 ]
+
+# SLACK API Configurations
+# ----------------------------------------------
+# use your keys
+SLACK_CLIENT_ID = os.environ.get('SLACK_CLIENT_ID')
+SLACK_CLIENT_SECRET = os.environ.get('SLACK_CLIENT_SECRET')
+SLACK_VERIFICATION_TOKEN = os.environ.get('SLACK_VERIFICATION_TOKEN')
+SLACK_BOT_USER_TOKEN = os.environ.get('SLACK_TOKEN')
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/

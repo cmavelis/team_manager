@@ -5,6 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonRespons
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 from django.views import generic
+from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 
 
@@ -151,6 +152,7 @@ def signup(request):
     return render(request, 'team/signup.html', {'form': form})
 
 
+@csrf_exempt
 def slack_test(request):
     if request.command == '/weather':
         response = {

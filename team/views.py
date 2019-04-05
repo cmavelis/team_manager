@@ -154,6 +154,7 @@ def signup(request):
 
 @csrf_exempt
 def slack_test(request):
+    print(request)
     if request.command == '/weather':
         response = {
             'text': 'Hi',

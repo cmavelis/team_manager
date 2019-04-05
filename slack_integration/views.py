@@ -101,7 +101,8 @@ def slack_my_events(request):
         except Player.DoesNotExist:
             return JsonResponse({
                 'text': 'Your Webapp account wasn\'t found.  '
-                        'Have you registered your Slack ID yet? Use /register [webapp nickname]',
+                        'Have you registered your Slack ID yet? '
+                        '\nUse /register [webapp nickname]',
             })
 
         event_list = Event.objects.all().order_by('date')

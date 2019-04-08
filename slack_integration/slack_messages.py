@@ -1,6 +1,4 @@
-import json
-
-create_event = json.dump([
+create_event = dict([
 	{
 		"type": "section",
 		"text": {

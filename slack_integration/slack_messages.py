@@ -19,7 +19,7 @@ create_event = {
                 "placeholder": {
                     "type": "plain_text",
                     "text": "Select a date",
-                    "emoji": 'true'
+                    "emoji": True
                 }
             }
         },
@@ -34,14 +34,14 @@ create_event = {
                 "placeholder": {
                     "type": "plain_text",
                     "text": "Select an item",
-                    "emoji": 'true'
+                    "emoji": True
                 },
                 "options": [
                     {
                         "text": {
                             "type": "plain_text",
                             "text": "Tournament",
-                            "emoji": 'true'
+                            "emoji": True
                         },
                         "value": "T"
                     },
@@ -49,7 +49,7 @@ create_event = {
                         "text": {
                             "type": "plain_text",
                             "text": "Scrimmage",
-                            "emoji": 'true'
+                            "emoji": True
                         },
                         "value": "S"
                     },
@@ -57,7 +57,7 @@ create_event = {
                         "text": {
                             "type": "plain_text",
                             "text": "Other",
-                            "emoji": 'true'
+                            "emoji": True
                         },
                         "value": "O"
                     }

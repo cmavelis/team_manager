@@ -1,4 +1,6 @@
-create_event = [
+import json
+
+create_event = json.dumps([
 	{
 		"type": "section",
 		"text": {
@@ -64,3 +66,4 @@ create_event = [
 		}
 	}
 ]
+)

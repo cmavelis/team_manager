@@ -47,7 +47,12 @@ def slack_create_event(request):
             ]
         }
 
-        return JsonResponse(create_event, safe=False)
+        interactive_response = {
+            'text': 'Supply some more information',
+            'attachments': create_event
+        }
+
+        return JsonResponse(interactive_response, safe=False)
 
 
 @csrf_exempt

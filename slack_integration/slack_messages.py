@@ -1,6 +1,6 @@
 import json
 
-create_event = json.dumps([
+create_event = json.dump([
 	{
 		"type": "section",
 		"text": {

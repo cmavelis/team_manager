@@ -1,5 +1,37 @@
+import os
+
 from team.models import Event, Player, Attendance
+from django.http import JsonResponse
 
 
 def send_slack_event_confirm(event, player):
-    player.slack_user_id
+    message = {
+        "token": os.environ["SLACK_TOKEN"],
+        "channel": player.slack_user_id,
+        "as_user": True,
+        "blocks": [
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "We don't have a response from you for *%s*-- can you make it?" % event.name
+                }
+            },
+            {
+                "type": "actions",
+                "elements": [
+                    {
+                        "type": "button",
+                        "text": {
+                            "type": "plain_text",
+                            "text": str(allowed_response),
+                            "emoji": True
+                        },
+                        "value": str(allowed_response)
+                    } for allowed_response in Attendance.ATTENDANCE_TYPES
+                ]
+            }
+        ]
+    }
+
+    return JsonResponse(message)

@@ -66,3 +66,47 @@ create_event = {
         }
     ]
 }
+
+bother_message = {
+    "blocks": [
+	{
+		"type": "section",
+		"text": {
+			"type": "mrkdwn",
+			"text": "We don't have a response from you for *EVENT*-- can you make it?"
+		}
+	},
+	{
+		"type": "actions",
+		"elements": [
+			{
+				"type": "button",
+				"text": {
+					"type": "plain_text",
+					"text": "Button",
+					"emoji": True
+				},
+				"value": "click_me_123"
+			},
+			{
+				"type": "button",
+				"text": {
+					"type": "plain_text",
+					"text": "Button",
+					"emoji": True
+				},
+				"value": "click_me_123"
+			},
+			{
+				"type": "button",
+				"text": {
+					"type": "plain_text",
+					"text": "Button",
+					"emoji": True
+				},
+				"value": "click_me_123"
+			}
+		]
+	}
+]
+}

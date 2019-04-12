@@ -121,7 +121,7 @@ def full_team_view(request):
         attendance = player.attendance_set.all()
         for event in event_list:
             try:
-                new_entry.append(attendance.get(event=event.id).status)
+                new_entry.append(attendance.get(event=event.id).get_status_display())
             except Attendance.DoesNotExist:
                 new_entry.append('ERR')
         players_info.append(new_entry)

@@ -9,7 +9,7 @@ def send_slack_event_confirm(event, player):
     message = {
         "token": os.environ["SLACK_TOKEN"],
         "channel": player.slack_user_id,
-        "as_user": True,
+        "as_user": False,
         "blocks": [
             {
                 "type": "section",

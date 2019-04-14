@@ -31,8 +31,8 @@ def slack_test(request):
         player = Player.objects.get(id=1)
         message_request = send_slack_event_confirm(event, player)
         r = requests.post('https://slack.com/api/chat.postMessage', data=message_request)
-        print(r)
-        return r
+        print(r.content)
+        return response
 
 
 @csrf_exempt

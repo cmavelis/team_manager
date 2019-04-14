@@ -25,10 +25,10 @@ def send_slack_event_confirm(event, player):
                         "type": "button",
                         "text": {
                             "type": "plain_text",
-                            "text": str(allowed_response),
+                            "text": str(allowed_response[1]),
                             "emoji": True
                         },
-                        "value": str(allowed_response)
+                        "value": str(allowed_response[0])
                     } for allowed_response in Attendance.ATTENDANCE_TYPES
                 ]
             }

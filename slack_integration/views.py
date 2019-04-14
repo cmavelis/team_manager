@@ -1,9 +1,12 @@
+import requests
+
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonResponse
 from django.utils import timezone
 
 from .slack_messages import create_event
+from .utils import send_slack_event_confirm
 from team.models import Event, Player, Attendance
 
 
@@ -23,6 +26,10 @@ def slack_test(request):
                 }
             ]
         }
+
+        event = Event.objects.get(id=1)
+        player = Player.objects.get(id=1)
+        requests.post('https://slack.com/api/chat.postMessage', data=send_slack_event_confirm(event, player))
 
         return JsonResponse(response)
 

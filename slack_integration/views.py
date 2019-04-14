@@ -32,7 +32,7 @@ def slack_test(request):
         message_request = send_slack_event_confirm(event, player)
         r = requests.post('https://slack.com/api/chat.postMessage', data=message_request)
         print(r)
-        return JsonResponse(r, safe=False)
+        return r
 
 
 @csrf_exempt

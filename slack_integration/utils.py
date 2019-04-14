@@ -13,7 +13,7 @@ def send_slack_event_confirm(event, player):
         "text": "test"
     }
 
-    return json.dumps(message)
+    return message
 
 # message = {
 #         "token": os.environ["SLACK_TOKEN"],

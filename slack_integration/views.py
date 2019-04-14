@@ -29,8 +29,9 @@ def slack_test(request):
 
         event = Event.objects.get(id=1)
         player = Player.objects.get(id=1)
-        r = requests.post('https://slack.com/api/chat.postMessage', data=send_slack_event_confirm(event, player))
-        print(r)
+        message_request = send_slack_event_confirm(event, player)
+        r = requests.post('https://slack.com/api/chat.postMessage', data=message_request)
+        print(message_request)
         return JsonResponse(response)
 
 

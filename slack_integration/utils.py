@@ -1,4 +1,5 @@
 import os
+import json
 
 from team.models import Event, Player, Attendance
 from django.http import JsonResponse
@@ -34,4 +35,4 @@ def send_slack_event_confirm(event, player):
         ]
     }
 
-    return JsonResponse(message)
+    return json.dumps(message)

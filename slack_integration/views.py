@@ -16,7 +16,7 @@ def slack_test(request):
         payload = request.POST
     else:
         return Http404
-    print(payload)
+    # print(payload)
     if payload['command'] == '/test_hi':
         response = {
             'text': 'Hi',
@@ -29,8 +29,8 @@ def slack_test(request):
 
         event = Event.objects.get(id=1)
         player = Player.objects.get(id=1)
-        requests.post('https://slack.com/api/chat.postMessage', data=send_slack_event_confirm(event, player))
-
+        r = requests.post('https://slack.com/api/chat.postMessage', data=send_slack_event_confirm(event, player))
+        print(r)
         return JsonResponse(response)
 
 

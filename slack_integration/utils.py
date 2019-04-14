@@ -10,7 +10,7 @@ def send_slack_event_confirm(event, player):
         "token": os.environ["SLACK_TOKEN"],
         "channel": player.slack_user_id,
         "as_user": True,
-        "blocks": [
+        "blocks": json.dumps([
             {
                 "type": "section",
                 "text": {
@@ -32,7 +32,7 @@ def send_slack_event_confirm(event, player):
                     } for allowed_response in Attendance.ATTENDANCE_TYPES
                 ]
             }
-        ]
+        ])
     }
 
     return message

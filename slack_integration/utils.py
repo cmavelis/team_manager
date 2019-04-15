@@ -10,6 +10,7 @@ def send_slack_event_confirm(event, player):
         "token": os.environ["SLACK_TOKEN"],
         "channel": player.slack_user_id,
         "as_user": True,
+        "text": "Your response is requested",
         "blocks": json.dumps([
             {
                 "type": "section",

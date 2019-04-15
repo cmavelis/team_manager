@@ -155,7 +155,7 @@ def slack_interactive(request):
         payload = json.loads(request.POST['payload'])
     else:
         return Http404
-    logger.info(str(payload))
+    # logger.info(str(payload))
     print(payload)
     response = {
         'text': 'Interactive button pressed',
@@ -165,5 +165,18 @@ def slack_interactive(request):
             }
         ]
     }
+
+    if payload['type'] == 'block_actions':
+        user_input = payload['actions']
+        new_message = {
+            "token": payload['token'],
+            "channel": payload['channel']['id'],
+            "message": {
+                "text": "Your response has been recorded as %s, thanks!" % 'TEST'
+            }
+        }
+        r = requests.post('https://slack.com/api/chat.update', params=new_message)
+        print(r.content)
+        print(user_input[0]['value'])
 
     return JsonResponse(response)

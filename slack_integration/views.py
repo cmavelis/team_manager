@@ -8,7 +8,7 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonRespons
 from django.utils import timezone
 
 from .slack_messages import create_event
-from .utils import send_slack_event_confirm
+from .utils import send_slack_event_confirm, give_player_event_dropdowns
 from team.models import Event, Player, Attendance
 from team_manager import settings
 
@@ -151,6 +151,22 @@ def slack_my_events(request):
 
 
 @csrf_exempt
+def slack_commands(request):  # TODO: bring all commands into one view
+    if request.method == 'POST':
+        payload = request.POST
+    else:
+        return Http404
+    print(payload)
+    if payload['command'] == '/event_query':
+        # event = Event.objects.get(id=1)
+        # player = Player.objects.get(id=1)
+        message_request = give_player_event_dropdowns()
+        r = requests.post('https://slack.com/api/chat.postMessage', params=message_request)
+        print(r.content)
+        return HttpResponse()
+
+
+@csrf_exempt
 def slack_interactive(request):
     if request.method == 'POST':
         payload = json.loads(request.POST['payload'])
@@ -169,6 +185,8 @@ def slack_interactive(request):
 
     if payload['type'] == 'block_actions':
         user_input = payload['actions']
+        attendance_response = user_input[0]['value']
+        att_res_display = dict(Attendance.ATTENDANCE_TYPES)[attendance_response]
         new_message = {
             "token": settings.SLACK_BOT_USER_TOKEN,
             "channel": payload['channel']['id'],
@@ -179,7 +197,7 @@ def slack_interactive(request):
                         "type": "section",
                         "text": {
                             "type": "mrkdwn",
-                            "text": "Your response has been recorded as %s, thanks!" % user_input[0]['value']
+                            "text": "Your response has been recorded as %s, thanks!" % att_res_display
                         }
                     }
                 ])

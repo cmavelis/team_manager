@@ -160,10 +160,14 @@ def slack_commands(request):  # TODO: bring all commands into one view
     if payload['command'] == '/event_query':
         # event = Event.objects.get(id=1)
         # player = Player.objects.get(id=1)
-        message_request = give_player_event_dropdowns()
-        r = requests.post('https://slack.com/api/chat.postMessage', params=message_request)
-        print(r.content)
-        return HttpResponse()
+
+        # user_id = payload['user_id']
+        # message_request = give_player_event_dropdowns(user_id)
+        # r = requests.post('https://slack.com/api/chat.postMessage', params=message_request)
+        # print(r.content)
+
+        return JsonResponse(give_player_event_dropdowns())
+        # return HttpResponse(status=200)
 
 
 @csrf_exempt

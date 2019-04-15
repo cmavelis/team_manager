@@ -173,8 +173,8 @@ def slack_interactive(request):
             "token": settings.SLACK_BOT_USER_TOKEN,
             "channel": payload['channel']['id'],
             "ts": payload['message']['ts'],
+            "text": 'text',
             "message": {
-                "text": 'text',
                 "blocks": json.dumps([
                     {
                         "type": "section",

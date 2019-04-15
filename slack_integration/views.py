@@ -174,8 +174,7 @@ def slack_interactive(request):
             "channel": payload['channel']['id'],
             "ts": payload['message']['ts'],
             "text": 'text',
-            "message": {
-                "blocks": json.dumps([
+            "blocks": json.dumps([
                     {
                         "type": "section",
                         "text": {
@@ -184,7 +183,6 @@ def slack_interactive(request):
                         }
                     }
                 ])
-            }
         }
         r = requests.post('https://slack.com/api/chat.update', params=new_message)
         print(r.content)

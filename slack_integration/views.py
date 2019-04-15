@@ -10,6 +10,7 @@ from django.utils import timezone
 from .slack_messages import create_event
 from .utils import send_slack_event_confirm
 from team.models import Event, Player, Attendance
+from team_manager import settings
 
 logger = logging.getLogger(__name__)
 
@@ -169,14 +170,13 @@ def slack_interactive(request):
     if payload['type'] == 'block_actions':
         user_input = payload['actions']
         new_message = {
-            "token": payload['token'],
+            "token": settings.SLACK_BOT_USER_TOKEN,
             "channel": payload['channel']['id'],
             "message": {
-                "text": "Your response has been recorded as %s, thanks!" % 'TEST'
+                "text": "Your response has been recorded as %s, thanks!" % user_input[0]['value']
             }
         }
         r = requests.post('https://slack.com/api/chat.update', params=new_message)
         print(r.content)
-        print(user_input[0]['value'])
 
     return JsonResponse(response)

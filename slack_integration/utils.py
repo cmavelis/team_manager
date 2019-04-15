@@ -1,13 +1,13 @@
-import os
 import json
 
 from team.models import Event, Player, Attendance
 from django.http import JsonResponse
+from team_manager import settings
 
 
 def send_slack_event_confirm(event, player):
     message = {
-        "token": os.environ["SLACK_TOKEN"],
+        "token": settings.SLACK_BOT_USER_TOKEN,
         "channel": player.slack_user_id,
         "as_user": True,
         "text": "Your response is requested",

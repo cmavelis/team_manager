@@ -156,6 +156,7 @@ def slack_interactive(request):
     else:
         return Http404
     logger.info(str(payload))
+    print(payload)
     response = {
         'text': 'Interactive button pressed',
         'attachments': [

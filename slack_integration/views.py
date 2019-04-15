@@ -135,3 +135,22 @@ def slack_my_events(request):
 
     else:
         return Http404
+
+
+@csrf_exempt
+def slack_interactive(request):
+    if request.method == 'POST':
+        payload = request.POST
+    else:
+        return Http404
+    print(payload)
+    response = {
+        'text': 'Interactive button pressed',
+        'attachments': [
+            {
+                'text': 'Sent by {}'.format(payload['user_name'])
+            }
+        ]
+    }
+
+    return JsonResponse(response)

@@ -152,12 +152,12 @@ def slack_interactive(request):
         payload = request.POST['payload']
     else:
         return Http404
-    print(json.loads(payload))
+    print(json.loads(payload)['type'])
     response = {
         'text': 'Interactive button pressed',
         'attachments': [
             {
-                'text': 'Sent by {}'.format(payload['user_name'])
+                'text': 'Sent by {}'.format(json.loads(payload)['user']['username'])
             }
         ]
     }

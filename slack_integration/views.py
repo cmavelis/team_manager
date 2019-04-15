@@ -1,4 +1,5 @@
 import requests
+import json
 
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
@@ -151,8 +152,7 @@ def slack_interactive(request):
         payload = request.POST['payload']
     else:
         return Http404
-    print(request)
-    print(payload)
+    print(json.loads(payload))
     response = {
         'text': 'Interactive button pressed',
         'attachments': [

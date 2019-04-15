@@ -172,8 +172,17 @@ def slack_interactive(request):
         new_message = {
             "token": settings.SLACK_BOT_USER_TOKEN,
             "channel": payload['channel']['id'],
+            "ts": payload['message']['ts'],
             "message": {
-                "text": "Your response has been recorded as %s, thanks!" % user_input[0]['value']
+                "blocks": json.dumps([
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "Your response has been recorded as %s, thanks!" % user_input[0]['value']
+                        }
+                    }
+                ])
             }
         }
         r = requests.post('https://slack.com/api/chat.update', params=new_message)

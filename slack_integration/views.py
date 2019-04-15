@@ -174,6 +174,7 @@ def slack_interactive(request):
             "channel": payload['channel']['id'],
             "ts": payload['message']['ts'],
             "message": {
+                "text": 'text',
                 "blocks": json.dumps([
                     {
                         "type": "section",

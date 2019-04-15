@@ -66,7 +66,7 @@ def give_player_event_dropdowns(user_id=1):
                                 "text": player.nickname,
                                 "emoji": True
                             },
-                            "value": player.id
+                            "value": str(player.id)
                         } for player in Player.objects.all()
                     ]
                 }
@@ -91,7 +91,7 @@ def give_player_event_dropdowns(user_id=1):
                                 "text": event.name,
                                 "emoji": True
                             },
-                            "value": event.id
+                            "value": str(event.id)
                         } for event in Event.objects.all()
                     ]
                 }

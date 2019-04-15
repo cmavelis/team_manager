@@ -1,5 +1,6 @@
 import requests
 import json
+import logging
 
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
@@ -9,6 +10,8 @@ from django.utils import timezone
 from .slack_messages import create_event
 from .utils import send_slack_event_confirm
 from team.models import Event, Player, Attendance
+
+logger = logging.getLogger(__name__)
 
 
 @csrf_exempt
@@ -149,10 +152,10 @@ def slack_my_events(request):
 @csrf_exempt
 def slack_interactive(request):
     if request.method == 'POST':
-        payload = request.POST['payload']
+        payload = json.loads(request.POST['payload'])
     else:
         return Http404
-    print(json.loads(payload)['type'])
+    logger.info(payload)
     response = {
         'text': 'Interactive button pressed',
         'attachments': [

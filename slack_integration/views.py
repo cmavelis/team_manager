@@ -166,6 +166,7 @@ def slack_commands(request):  # TODO: bring all commands into one view
         # r = requests.post('https://slack.com/api/chat.postMessage', params=message_request)
         # print(r.content)
 
+        print(give_player_event_dropdowns())
         return JsonResponse(give_player_event_dropdowns())
         # return HttpResponse(status=200)
 

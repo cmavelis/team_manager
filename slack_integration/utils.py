@@ -56,7 +56,7 @@ def give_player_event_dropdowns(user_id=1):
                 },
                 "accessory": {
                     "type": "static_select",
-                    "action_id": "event_id",
+                    "action_id": "player_id",
                     "placeholder": {
                         "type": "plain_text",
                         "text": "Player",

@@ -203,7 +203,7 @@ def slack_interactive(request):
                 print('message sent to player')
                 print(r)
                 # TODO: edit original prompt to confirm sent message
-                return response
+                return JsonResponse(response)
 
             # add response info to message object
             action_value = payload['actions'][0]['selected_option']['value']

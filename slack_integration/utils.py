@@ -13,7 +13,6 @@ def send_slack_event_confirm(event, player):
         "blocks": json.dumps([
             {
                 "type": "section",
-                "block_id": "event_rq_response",
                 "text": {
                     "type": "mrkdwn",
                     "text": "We don't have a response from you for *%s*-- can you make it?" % event.name
@@ -21,6 +20,7 @@ def send_slack_event_confirm(event, player):
             },
             {
                 "type": "actions",
+                "block_id": "event_rq_response",
                 "elements": [
                     {
                         "type": "button",
@@ -49,7 +49,7 @@ def give_player_event_dropdowns(user_id=1):
         "blocks": json.dumps([
             {
                 "type": "section",
-                "block_id": block_id,
+                "block_id": block_id + "_player",
                 "text": {
                     "type": "mrkdwn",
                     "text": "Please pick a player"
@@ -76,7 +76,7 @@ def give_player_event_dropdowns(user_id=1):
             },
             {
                 "type": "section",
-                "block_id": block_id,
+                "block_id": block_id + "_event",
                 "text": {
                     "type": "mrkdwn",
                     "text": "Please pick an event"
@@ -103,7 +103,7 @@ def give_player_event_dropdowns(user_id=1):
             },
             {
                 "type": "actions",
-                "block_id": block_id,
+                "block_id": block_id + "_send",
                 "elements": [
                     {
                         "type": "button",

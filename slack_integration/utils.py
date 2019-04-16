@@ -1,7 +1,6 @@
 import json
 
 from team.models import Event, Player, Attendance
-from django.http import JsonResponse
 from team_manager import settings
 
 
@@ -14,6 +13,7 @@ def send_slack_event_confirm(event, player):
         "blocks": json.dumps([
             {
                 "type": "section",
+                "block_id": "event_rq_response",
                 "text": {
                     "type": "mrkdwn",
                     "text": "We don't have a response from you for *%s*-- can you make it?" % event.name
@@ -48,6 +48,7 @@ def give_player_event_dropdowns(user_id=1):
         "blocks": json.dumps([
             {
                 "type": "section",
+                "block_id": "event_rq_dd",
                 "text": {
                     "type": "mrkdwn",
                     "text": "Please pick a player"
@@ -56,13 +57,14 @@ def give_player_event_dropdowns(user_id=1):
                     "type": "static_select",
                     "placeholder": {
                         "type": "plain_text",
-                        "text": "Players",
+                        "text": "Player",
                         "emoji": True
                     },
                     "options": [
                         {
                             "text": {
                                 "type": "plain_text",
+                                "action_id": "player_id",
                                 "text": player.nickname,
                                 "emoji": True
                             },
@@ -81,13 +83,14 @@ def give_player_event_dropdowns(user_id=1):
                     "type": "static_select",
                     "placeholder": {
                         "type": "plain_text",
-                        "text": "Events",
+                        "text": "Event",
                         "emoji": True
                     },
                     "options": [
                         {
                             "text": {
                                 "type": "plain_text",
+                                "action_id": "event_id",
                                 "text": event.name,
                                 "emoji": True
                             },
@@ -95,6 +98,21 @@ def give_player_event_dropdowns(user_id=1):
                         } for event in Event.objects.all()
                     ]
                 }
+            },
+            {
+                "type": "actions",
+                "elements": [
+                    {
+                        "type": "button",
+                        "action_id": "send_message",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "Send request",
+                            "emoji": True
+                        },
+                        "value": "send"
+                    }
+                ]
             }
         ])
     }

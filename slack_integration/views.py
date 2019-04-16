@@ -11,6 +11,7 @@ from .slack_messages import create_event
 from .utils import send_slack_event_confirm, give_player_event_dropdowns
 from team.models import Event, Player, Attendance
 from team_manager import settings
+from slack_integration.models import InteractiveMessage
 
 logger = logging.getLogger(__name__)
 
@@ -158,17 +159,7 @@ def slack_commands(request):  # TODO: bring all commands into one view
         return Http404
     print(payload)
     if payload['command'] == '/event_query':
-        # event = Event.objects.get(id=1)
-        # player = Player.objects.get(id=1)
-
-        # user_id = payload['user_id']
-        # message_request = give_player_event_dropdowns(user_id)
-        # r = requests.post('https://slack.com/api/chat.postMessage', params=message_request)
-        # print(r.content)
-
-        print(give_player_event_dropdowns())
         return JsonResponse(give_player_event_dropdowns())
-        # return HttpResponse(status=200)
 
 
 @csrf_exempt
@@ -177,10 +168,9 @@ def slack_interactive(request):
         payload = json.loads(request.POST['payload'])
     else:
         return Http404
-    # logger.info(str(payload))
     print(payload)
     response = {
-        'text': 'Interactive button pressed',
+        'text': 'Interactive action received',
         'attachments': [
             {
                 'text': 'Sent by {}'.format(payload['user']['username'])
@@ -189,25 +179,58 @@ def slack_interactive(request):
     }
 
     if payload['type'] == 'block_actions':
-        user_input = payload['actions']
-        attendance_response = user_input[0]['value']
-        att_res_display = dict(Attendance.ATTENDANCE_TYPES)[attendance_response]
-        new_message = {
-            "token": settings.SLACK_BOT_USER_TOKEN,
-            "channel": payload['channel']['id'],
-            "ts": payload['message']['ts'],
-            "text": 'text',
-            "blocks": json.dumps([
-                    {
-                        "type": "section",
-                        "text": {
-                            "type": "mrkdwn",
-                            "text": "Your response has been recorded as %s, thanks!" % att_res_display
+        original_time_stamp = payload['message']['ts']
+        first_block_id = payload['message']['blocks'][0]['block_id']
+
+        # event request dropdowns handling
+        if first_block_id == 'event_rq_dd':
+            # find or create message DB entry
+            try:
+                msg = InteractiveMessage.objects.get(slack_message_ts=original_time_stamp)
+            except InteractiveMessage.DoesNotExist:
+                msg = InteractiveMessage.objects.create(slack_message_ts=original_time_stamp)
+
+            # add response info to message object
+            action_id = payload['actions']['action_id']
+            action_value = payload['actions']['value']
+            if action_id == 'player_id':
+                msg.player_id = action_value
+                msg.save()
+            elif action_id == 'event_id':
+                msg.event_id = action_value
+                msg.save()
+
+            # sending message to player
+            elif action_id == 'send_message':
+                event = Event.objects.get(id=msg.event_id)
+                player = Player.objects.get(id=msg.player_id)
+                message_request = send_slack_event_confirm(event, player)
+                r = requests.post('https://slack.com/api/chat.postMessage', params=message_request)
+                print('message sent to player')
+                print(r)
+                # TODO: edit original prompt to confirm sent message
+
+        # handling response back from player
+        if first_block_id == 'event_rq_response':
+            user_input = payload['actions']
+            attendance_response = user_input[0]['value']
+            att_res_display = dict(Attendance.ATTENDANCE_TYPES)[attendance_response]
+            new_message = {
+                "token": settings.SLACK_BOT_USER_TOKEN,
+                "channel": payload['channel']['id'],
+                "ts": payload['message']['ts'],
+                "text": 'text',
+                "blocks": json.dumps([
+                        {
+                            "type": "section",
+                            "text": {
+                                "type": "mrkdwn",
+                                "text": "Your response has been recorded as *%s*, thanks!" % att_res_display
+                            }
                         }
-                    }
-                ])
-        }
-        r = requests.post('https://slack.com/api/chat.update', params=new_message)
-        print(r.content)
+                    ])
+            }
+            r = requests.post('https://slack.com/api/chat.update', params=new_message)
+            print(r.content)
 
     return JsonResponse(response)

@@ -195,6 +195,8 @@ def slack_interactive(request):
             # sending message to player
             if action_id == 'send_message':
                 event = Event.objects.get(id=msg.event_id)
+                print(msg.event_id)
+                print(msg.player_id)
                 player = Player.objects.get(id=msg.player_id)
                 message_request = send_slack_event_confirm(event, player)
                 r = requests.post('https://slack.com/api/chat.postMessage', params=message_request)

@@ -191,18 +191,9 @@ def slack_interactive(request):
             except InteractiveMessage.DoesNotExist:
                 msg = InteractiveMessage.objects.create(slack_message_ts=original_time_stamp)
 
-            # add response info to message object
             action_id = payload['actions'][0]['action_id']
-            action_value = payload['actions'][0]['selected_option']['value']
-            if action_id == 'player_id':
-                msg.player_id = action_value
-                msg.save()
-            elif action_id == 'event_id':
-                msg.event_id = action_value
-                msg.save()
-
             # sending message to player
-            elif action_id == 'send_message':
+            if action_id == 'send_message':
                 event = Event.objects.get(id=msg.event_id)
                 player = Player.objects.get(id=msg.player_id)
                 message_request = send_slack_event_confirm(event, player)
@@ -210,6 +201,16 @@ def slack_interactive(request):
                 print('message sent to player')
                 print(r)
                 # TODO: edit original prompt to confirm sent message
+                return response
+
+            # add response info to message object
+            action_value = payload['actions'][0]['selected_option']['value']
+            if action_id == 'player_id':
+                msg.player_id = action_value
+                msg.save()
+            elif action_id == 'event_id':
+                msg.event_id = action_value
+                msg.save()
 
         # handling response back from player
         if block_id.startswith('event_rq_response'):

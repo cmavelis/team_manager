@@ -193,7 +193,7 @@ def slack_interactive(request):
 
             # add response info to message object
             action_id = payload['actions'][0]['action_id']
-            action_value = payload['actions'][0]['value']
+            action_value = payload['actions'][0]['selected_option']['value']
             if action_id == 'player_id':
                 msg.player_id = action_value
                 msg.save()

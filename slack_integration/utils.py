@@ -55,6 +55,7 @@ def give_player_event_dropdowns(user_id=1):
                 },
                 "accessory": {
                     "type": "static_select",
+                    "action_id": "event_id",
                     "placeholder": {
                         "type": "plain_text",
                         "text": "Player",
@@ -64,7 +65,6 @@ def give_player_event_dropdowns(user_id=1):
                         {
                             "text": {
                                 "type": "plain_text",
-                                "action_id": "player_id",
                                 "text": player.nickname,
                                 "emoji": True
                             },
@@ -81,6 +81,7 @@ def give_player_event_dropdowns(user_id=1):
                 },
                 "accessory": {
                     "type": "static_select",
+                    "action_id": "event_id",
                     "placeholder": {
                         "type": "plain_text",
                         "text": "Event",
@@ -90,7 +91,6 @@ def give_player_event_dropdowns(user_id=1):
                         {
                             "text": {
                                 "type": "plain_text",
-                                "action_id": "event_id",
                                 "text": event.name,
                                 "emoji": True
                             },

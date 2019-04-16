@@ -181,7 +181,7 @@ def slack_interactive(request):
 
     if payload['type'] == 'block_actions':
         original_time_stamp = payload['container']['message_ts']
-        block_id = payload['actions']['block_id']
+        block_id = payload['actions'][0]['block_id']
 
         # event request dropdowns handling
         if block_id.startswith('event_rq_dropdowns'):
@@ -192,8 +192,8 @@ def slack_interactive(request):
                 msg = InteractiveMessage.objects.create(slack_message_ts=original_time_stamp)
 
             # add response info to message object
-            action_id = payload['actions']['action_id']
-            action_value = payload['actions']['value']
+            action_id = payload['actions'][0]['action_id']
+            action_value = payload['actions'][0]['value']
             if action_id == 'player_id':
                 msg.player_id = action_value
                 msg.save()
@@ -213,8 +213,8 @@ def slack_interactive(request):
 
         # handling response back from player
         if block_id.startswith('event_rq_response'):
-            user_input = payload['actions']
-            attendance_response = user_input[0]['value']
+            user_input = payload['actions'][0]
+            attendance_response = user_input['value']
             att_res_display = dict(Attendance.ATTENDANCE_TYPES)[attendance_response]
             new_message = {
                 "token": settings.SLACK_BOT_USER_TOKEN,

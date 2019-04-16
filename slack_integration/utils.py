@@ -40,6 +40,7 @@ def send_slack_event_confirm(event, player):
 
 
 def give_player_event_dropdowns(user_id=1):
+    block_id = "event_rq_dropdowns"
     message = {
         # "token": settings.SLACK_BOT_USER_TOKEN,
         # "channel": user_id,
@@ -48,7 +49,7 @@ def give_player_event_dropdowns(user_id=1):
         "blocks": json.dumps([
             {
                 "type": "section",
-                "block_id": "event_rq_dd",
+                "block_id": block_id,
                 "text": {
                     "type": "mrkdwn",
                     "text": "Please pick a player"
@@ -75,6 +76,7 @@ def give_player_event_dropdowns(user_id=1):
             },
             {
                 "type": "section",
+                "block_id": block_id,
                 "text": {
                     "type": "mrkdwn",
                     "text": "Please pick an event"
@@ -101,6 +103,7 @@ def give_player_event_dropdowns(user_id=1):
             },
             {
                 "type": "actions",
+                "block_id": block_id,
                 "elements": [
                     {
                         "type": "button",

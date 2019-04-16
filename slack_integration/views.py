@@ -180,11 +180,11 @@ def slack_interactive(request):
     }
 
     if payload['type'] == 'block_actions':
-        original_time_stamp = payload['message']['ts']
-        first_block_id = payload['message']['blocks'][0]['block_id']
+        original_time_stamp = payload['container']['message_ts']
+        block_id = payload['actions']['block_id']
 
         # event request dropdowns handling
-        if first_block_id == 'event_rq_dd':
+        if block_id == 'event_rq_dropdowns':
             # find or create message DB entry
             try:
                 msg = InteractiveMessage.objects.get(slack_message_ts=original_time_stamp)
@@ -212,7 +212,7 @@ def slack_interactive(request):
                 # TODO: edit original prompt to confirm sent message
 
         # handling response back from player
-        if first_block_id == 'event_rq_response':
+        if block_id == 'event_rq_response':
             user_input = payload['actions']
             attendance_response = user_input[0]['value']
             att_res_display = dict(Attendance.ATTENDANCE_TYPES)[attendance_response]

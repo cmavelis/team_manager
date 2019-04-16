@@ -159,6 +159,7 @@ def slack_commands(request):  # TODO: bring all commands into one view
         return Http404
     print(payload)
     if payload['command'] == '/event_query':
+        print(JsonResponse(give_player_event_dropdowns()))
         return JsonResponse(give_player_event_dropdowns())
 
 

@@ -5,19 +5,21 @@ from team_manager import settings
 
 
 def send_slack_event_confirm(event, player):
+    question_block = {
+        "type": "section",
+        "text": {
+            "type": "mrkdwn",
+            "text": "We don't have a response from you for *%s*-- can you make it?" % event.name
+        }
+    }
+
     message = {
         "token": settings.SLACK_BOT_USER_TOKEN,
         "channel": player.slack_user_id,
         "as_user": True,
         "text": "Your response is requested",
         "blocks": json.dumps([
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": "We don't have a response from you for *%s*-- can you make it?" % event.name
-                }
-            },
+            question_block,
             {
                 "type": "actions",
                 "block_id": "event_rq_response",
@@ -36,7 +38,7 @@ def send_slack_event_confirm(event, player):
         ])
     }
 
-    return message
+    return message, question_block
 
 
 def give_player_event_dropdowns(user_id=1):

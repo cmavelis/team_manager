@@ -16,6 +16,17 @@ from slack_integration.models import InteractiveMessage
 logger = logging.getLogger(__name__)
 
 
+def compose_message(channel, ts, text, blocks):
+    new_message = {
+        "token": settings.SLACK_BOT_USER_TOKEN,
+        "channel": channel,
+        "ts": ts,
+        "text": text,
+        "blocks": blocks,
+    }
+    return new_message
+
+
 @csrf_exempt
 def slack_test(request):
     if request.method == 'POST':
@@ -33,11 +44,6 @@ def slack_test(request):
             ]
         }
 
-        event = Event.objects.get(id=1)
-        player = Player.objects.get(id=1)
-        message_request = send_slack_event_confirm(event, player)
-        r = requests.post('https://slack.com/api/chat.postMessage', params=message_request)
-        print(r.content)
         return JsonResponse(response)
 
 
@@ -220,51 +226,36 @@ def slack_interactive(request):
             attendance_response = user_input['value']
             att_res_display = dict(Attendance.ATTENDANCE_TYPES)[attendance_response]
 
-            base_message = {
-                "token": settings.SLACK_BOT_USER_TOKEN,
-                "channel": payload['container']['channel_id'],
-                "ts": original_time_stamp,
-            }
+            msg = get_object_or_404(InteractiveMessage, slack_message_ts=original_time_stamp)
+            attendance = get_object_or_404(Attendance, event=msg.event_id, player=msg.event_id)
 
-            success_message = base_message
-            success_message['text'] = 'Recorded'
-            success_message['blocks'] = json.dumps([
-                {
+            # attempting to update attendance database entry
+            try:
+                attendance.status = attendance_response
+                attendance.save()
+                blocks = [{
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
                         "text": "Your response has been recorded as *%s*, thanks!" % att_res_display
                     }
-                }
-            ])
-            #     "text": 'Recorded',
-            #     "blocks": json.dumps([
-            #             {
-            #                 "type": "section",
-            #                 "text": {
-            #                     "type": "mrkdwn",
-            #                     "text": "Your response has been recorded as *%s*, thanks!" % att_res_display
-            #                 }
-            #             }
-            #         ])
-            # }
-
-            failure_message = {
-                "token": settings.SLACK_BOT_USER_TOKEN,
-                "channel": payload['container']['channel_id'],
-                "ts": original_time_stamp,
-                "text": 'Recorded',
-                "blocks": json.dumps([
+                }]
+            except:
+                blocks = [
                     {
                         "type": "section",
                         "text": {
                             "type": "mrkdwn",
-                            "text": "Your response has been recorded as *%s*, thanks!" % att_res_display
+                            "text": "Your response could not be recorded."
                         }
                     }
-                ])
-            }
-            r = requests.post('https://slack.com/api/chat.update', params=success_message)
-            print(r.content)
+                ]
+            finally:
+                message = compose_message(payload['container']['channel_id'],
+                                          original_time_stamp,
+                                          text='Failed',
+                                          blocks=json.dumps(blocks))
+                r = requests.post('https://slack.com/api/chat.update', params=message)
+                print(r.content)
 
     return JsonResponse(response)

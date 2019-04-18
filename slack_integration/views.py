@@ -219,22 +219,52 @@ def slack_interactive(request):
             user_input = payload['actions'][0]
             attendance_response = user_input['value']
             att_res_display = dict(Attendance.ATTENDANCE_TYPES)[attendance_response]
-            new_message = {
+
+            base_message = {
                 "token": settings.SLACK_BOT_USER_TOKEN,
                 "channel": payload['container']['channel_id'],
                 "ts": original_time_stamp,
-                "text": 'text',
-                "blocks": json.dumps([
-                        {
-                            "type": "section",
-                            "text": {
-                                "type": "mrkdwn",
-                                "text": "Your response has been recorded as *%s*, thanks!" % att_res_display
-                            }
-                        }
-                    ])
             }
-            r = requests.post('https://slack.com/api/chat.update', params=new_message)
+
+            success_message = base_message
+            success_message['text'] = 'Recorded'
+            success_message['blocks'] = json.dumps([
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": "Your response has been recorded as *%s*, thanks!" % att_res_display
+                    }
+                }
+            ])
+            #     "text": 'Recorded',
+            #     "blocks": json.dumps([
+            #             {
+            #                 "type": "section",
+            #                 "text": {
+            #                     "type": "mrkdwn",
+            #                     "text": "Your response has been recorded as *%s*, thanks!" % att_res_display
+            #                 }
+            #             }
+            #         ])
+            # }
+
+            failure_message = {
+                "token": settings.SLACK_BOT_USER_TOKEN,
+                "channel": payload['container']['channel_id'],
+                "ts": original_time_stamp,
+                "text": 'Recorded',
+                "blocks": json.dumps([
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "Your response has been recorded as *%s*, thanks!" % att_res_display
+                        }
+                    }
+                ])
+            }
+            r = requests.post('https://slack.com/api/chat.update', params=success_message)
             print(r.content)
 
     return JsonResponse(response)

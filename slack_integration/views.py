@@ -219,32 +219,30 @@ def slack_interactive(request):
             attendance = get_object_or_404(Attendance, event=msg.event_id, player=msg.event_id)
 
             # attempting to update attendance database entry
-            try:
-                attendance.status = attendance_response
-                attendance.save()
-                blocks = [{
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": "Your response has been recorded as *%s*, thanks!" % att_res_display
-                    }
-                }]
-            except:
-                blocks = [
-                    {
-                        "type": "section",
-                        "text": {
-                            "type": "mrkdwn",
-                            "text": "Your response could not be recorded."
-                        }
-                    }
-                ]
-            finally:
-                message = compose_message(payload['container']['channel_id'],
-                                          original_time_stamp,
-                                          text='Failed',
-                                          blocks=json.dumps(blocks))
-                r = requests.post('https://slack.com/api/chat.update', params=message)
-                print(r.content)
+            attendance.status = attendance_response
+            attendance.save()
+            blocks = [{
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "Your response has been recorded as *%s*, thanks!" % att_res_display
+                }
+            }]
+            # #failure message
+            # blocks = [
+            #     {
+            #         "type": "section",
+            #         "text": {
+            #             "type": "mrkdwn",
+            #             "text": "Your response could not be recorded."
+            #         }
+            #     }
+            # ]
+            message = compose_message(payload['container']['channel_id'],
+                                      original_time_stamp,
+                                      text='Failed',
+                                      blocks=json.dumps(blocks))
+            r = requests.post('https://slack.com/api/chat.update', params=message)
+            print(r.content)
 
     return JsonResponse(response)

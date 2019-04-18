@@ -206,8 +206,7 @@ def slack_interactive(request):
                 for player in player_list:
                     print(player)
                     message_request, _ = send_slack_event_confirm(event, player, msg.id)
-                    # r = requests.post('https://slack.com/api/chat.postMessage', params=message_request)
-                    print(message_request)
+                    r = requests.post('https://slack.com/api/chat.postMessage', params=message_request)
 
                 print('message sent to player')
                 # TODO: edit original prompt to confirm sent message

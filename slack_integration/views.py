@@ -154,8 +154,11 @@ def slack_commands(request):  # TODO: bring all commands into one view
         return Http404
     print(payload)
     if payload['command'] == '/event_query':
-        print(give_player_event_dropdowns())
-        return JsonResponse(give_player_event_dropdowns())
+        new_ephemeral_message = give_player_event_dropdowns(user_id=payload['user'],
+                                                            channel=payload['channel'])
+        print(new_ephemeral_message)
+
+        return JsonResponse(new_ephemeral_message)
 
 
 @csrf_exempt

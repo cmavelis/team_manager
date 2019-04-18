@@ -188,11 +188,9 @@ def slack_interactive(request):
 
             action_id = payload['actions'][0]['action_id']
 
-            # sending message to player
+            # sending query when button is pressed
             if action_id == 'send_message':
-                print(msg.event_id)
                 event = Event.objects.get(id=msg.event_id)
-                print(msg.player_id)
 
                 # 0 means all pending players
                 if msg.player_id == 0:
@@ -209,7 +207,20 @@ def slack_interactive(request):
                     r = requests.post('https://slack.com/api/chat.postMessage', params=message_request)
 
                 print('message sent to player')
-                # TODO: edit original prompt to confirm sent message
+                blocks = [{
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": "You've sent requests to the following players:" +
+                                ''.join(['\n%s' % p for p in player_list])
+                    }
+                }]
+
+                message = compose_message(payload['container']['channel_id'],
+                                          original_time_stamp,
+                                          text='Sent',
+                                          blocks=json.dumps(blocks))
+                r = requests.post('https://slack.com/api/chat.update', params=message)
                 return JsonResponse(response)
 
             # add response info to message object

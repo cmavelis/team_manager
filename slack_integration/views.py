@@ -197,7 +197,7 @@ def slack_interactive(request):
                 # 0 means all pending players
                 if msg.player_id == 0:
                     all_pending_attendance = Attendance.objects.filter(event=event,
-                                                                       status='P',
+                                                                       status__in=['P', 'U'],
                                                                        player__slack_user_id__isnull=False)
                     player_list = [attendance.player for attendance in all_pending_attendance]
                 else:

@@ -211,12 +211,15 @@ def slack_interactive(request):
 
         # handling response back from player
         if block_id.startswith('event_rq_response'):
+            print('inside response')
             user_input = payload['actions'][0]
             attendance_response = user_input['value']
             att_res_display = dict(Attendance.ATTENDANCE_TYPES)[attendance_response]
 
             msg = get_object_or_404(InteractiveMessage, slack_message_ts=original_time_stamp)
+            print('message found')
             attendance = get_object_or_404(Attendance, event=msg.event_id, player=msg.player_id)
+            print('attn found')
 
             # attempting to update attendance database entry
             attendance.status = attendance_response

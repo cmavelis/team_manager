@@ -216,7 +216,7 @@ def slack_interactive(request):
             att_res_display = dict(Attendance.ATTENDANCE_TYPES)[attendance_response]
 
             msg = get_object_or_404(InteractiveMessage, slack_message_ts=original_time_stamp)
-            attendance = get_object_or_404(Attendance, event=msg.event_id, player=msg.event_id)
+            attendance = get_object_or_404(Attendance, event=msg.event_id, player=msg.player_id)
 
             # attempting to update attendance database entry
             attendance.status = attendance_response

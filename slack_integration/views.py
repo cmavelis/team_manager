@@ -193,7 +193,7 @@ def slack_interactive(request):
                 print(msg.event_id)
                 print(msg.player_id)
                 player = Player.objects.get(id=msg.player_id)
-                message_request, _ = send_slack_event_confirm(event, player)
+                message_request, _ = send_slack_event_confirm(event, player, msg.id)
                 r = requests.post('https://slack.com/api/chat.postMessage', params=message_request)
                 print('message sent to player')
                 print(r)
@@ -216,7 +216,7 @@ def slack_interactive(request):
             attendance_response = user_input['value']
             att_res_display = dict(Attendance.ATTENDANCE_TYPES)[attendance_response]
 
-            msg = get_object_or_404(InteractiveMessage, slack_message_ts=original_time_stamp)
+            msg = get_object_or_404(InteractiveMessage, id=block_id.strip('_')[-1])
             print('message found')
             attendance = get_object_or_404(Attendance, event=msg.event_id, player=msg.player_id)
             print('attn found')

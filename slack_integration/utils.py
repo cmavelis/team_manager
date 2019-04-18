@@ -15,7 +15,7 @@ def compose_message(channel, ts, text, blocks):
     return new_message
 
 
-def send_slack_event_confirm(event, player):
+def send_slack_event_confirm(event, player, msg_id):
     question_block = {
         "type": "section",
         "text": {
@@ -33,7 +33,7 @@ def send_slack_event_confirm(event, player):
             question_block,
             {
                 "type": "actions",
-                "block_id": "event_rq_response",
+                "block_id": "event_rq_response_" + str(msg_id),
                 "elements": [
                     {
                         "type": "button",

@@ -223,7 +223,9 @@ def slack_interactive(request):
                                           original_time_stamp,
                                           text='Sent',
                                           blocks=json.dumps(blocks))
+                print(message)
                 r = requests.post('https://slack.com/api/chat.update', params=message)
+                print(r)
                 return JsonResponse(response)
 
             # add response info to message object

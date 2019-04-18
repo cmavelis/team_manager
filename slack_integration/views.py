@@ -211,10 +211,13 @@ def slack_interactive(request):
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": "You've sent requests to the following players:" +
-                                ''.join(['\n%s' % p.nickname for p in player_list])
+                        "text": "You've sent requests to the following players:"
                     }
                 }]
+
+                # TODO: add this back into above
+                # +
+                # ''.join(['\n%s' % p.nickname for p in player_list])
 
                 message = compose_message(payload['container']['channel_id'],
                                           original_time_stamp,
@@ -266,7 +269,7 @@ def slack_interactive(request):
             # ]
             message = compose_message(payload['container']['channel_id'],
                                       original_time_stamp,
-                                      text='Failed',
+                                      text='Succeeded',
                                       blocks=json.dumps(blocks))
             r = requests.post('https://slack.com/api/chat.update', params=message)
             print(r.content)

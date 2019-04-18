@@ -79,6 +79,15 @@ def give_player_event_dropdowns(user_id=1):
                         {
                             "text": {
                                 "type": "plain_text",
+                                "text": "All pending players",
+                                "emoji": True
+                            },
+                            "value": "0"
+                        }
+                    ] + [
+                        {
+                            "text": {
+                                "type": "plain_text",
                                 "text": player.nickname,
                                 "emoji": True
                             },

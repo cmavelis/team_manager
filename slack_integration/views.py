@@ -187,16 +187,27 @@ def slack_interactive(request):
                 msg = InteractiveMessage.objects.create(slack_message_ts=original_time_stamp)
 
             action_id = payload['actions'][0]['action_id']
+
             # sending message to player
             if action_id == 'send_message':
-                event = Event.objects.get(id=msg.event_id)
                 print(msg.event_id)
+                event = Event.objects.get(id=msg.event_id)
                 print(msg.player_id)
-                player = Player.objects.get(id=msg.player_id)
-                message_request, _ = send_slack_event_confirm(event, player, msg.id)
-                r = requests.post('https://slack.com/api/chat.postMessage', params=message_request)
+
+                # 0 means all pending players
+                if msg.player_id == 0:
+                    all_pending_attendance = Attendance.objects.filter(event=event,
+                                                                       status='P',
+                                                                       player__slack_user_id__isnull=False)
+                    player_list = [attendance.player for attendance in all_pending_attendance]
+                else:
+                    player_list = [Player.objects.get(id=msg.player_id)]
+
+                for player in player_list:
+                    print(player)
+                    message_request, _ = send_slack_event_confirm(event, player, msg.id)
+                    r = requests.post('https://slack.com/api/chat.postMessage', params=message_request)
                 print('message sent to player')
-                print(r)
                 # TODO: edit original prompt to confirm sent message
                 return JsonResponse(response)
 
@@ -211,7 +222,6 @@ def slack_interactive(request):
 
         # handling response back from player
         if block_id.startswith('event_rq_response'):
-            print('inside response')
             user_input = payload['actions'][0]
             attendance_response = user_input['value']
             att_res_display = dict(Attendance.ATTENDANCE_TYPES)[attendance_response]

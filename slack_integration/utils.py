@@ -52,14 +52,14 @@ def send_slack_event_confirm(event, player, msg_id):
     return message, question_block
 
 
-def give_player_event_dropdowns(channel, user_id=1):
+def give_player_event_dropdowns():
     block_id = "event_rq_dropdowns"
     message = {
         "token": settings.SLACK_BOT_USER_TOKEN,
-        "channel": channel,
+        # "channel": channel,
         "as_user": True,
         "text": "Define your query",
-        "user": user_id,
+        # "user": user_id,
         "blocks": json.dumps([
             {
                 "type": "section",

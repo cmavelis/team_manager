@@ -8,23 +8,12 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonRespons
 from django.utils import timezone
 
 from .slack_messages import create_event
-from .utils import send_slack_event_confirm, give_player_event_dropdowns
+from .utils import send_slack_event_confirm, give_player_event_dropdowns, compose_message
 from team.models import Event, Player, Attendance
 from team_manager import settings
 from slack_integration.models import InteractiveMessage
 
 logger = logging.getLogger(__name__)
-
-
-def compose_message(channel, ts, text, blocks):
-    new_message = {
-        "token": settings.SLACK_BOT_USER_TOKEN,
-        "channel": channel,
-        "ts": ts,
-        "text": text,
-        "blocks": blocks,
-    }
-    return new_message
 
 
 @csrf_exempt

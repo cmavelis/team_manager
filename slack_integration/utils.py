@@ -4,6 +4,17 @@ from team.models import Event, Player, Attendance
 from team_manager import settings
 
 
+def compose_message(channel, ts, text, blocks):
+    new_message = {
+        "token": settings.SLACK_BOT_USER_TOKEN,
+        "channel": channel,
+        "ts": ts,
+        "text": text,
+        "blocks": blocks,
+    }
+    return new_message
+
+
 def send_slack_event_confirm(event, player):
     question_block = {
         "type": "section",

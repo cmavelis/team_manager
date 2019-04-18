@@ -43,7 +43,7 @@ def send_slack_event_confirm(event, player, msg_id):
                             "emoji": True
                         },
                         "value": str(allowed_response[0])
-                    } for allowed_response in Attendance.ATTENDANCE_TYPES
+                    } for allowed_response in Attendance.ATTENDANCE_TYPES if allowed_response[0] != 'P'
                 ]
             }
         ])

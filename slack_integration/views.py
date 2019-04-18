@@ -228,7 +228,8 @@ def slack_interactive(request):
 
             msg = get_object_or_404(InteractiveMessage, id=block_id.split('_')[-1])
             print('message found')
-            attendance = get_object_or_404(Attendance, event=msg.event_id, player=msg.player_id)
+            attendance = get_object_or_404(Attendance, event=msg.event_id,
+                                           player__slack_user_id=payload['user']['id'])
             print('attn found')
 
             # attempting to update attendance database entry
@@ -255,7 +256,9 @@ def slack_interactive(request):
                                       original_time_stamp,
                                       text='Failed',
                                       blocks=json.dumps(blocks))
-            r = requests.post('https://slack.com/api/chat.update', params=message)
-            print(r.content)
+            print(message)
+            # TODO: uncomment these 2 lines to make it send again
+            # r = requests.post('https://slack.com/api/chat.update', params=message)
+            # print(r.content)
 
     return JsonResponse(response)

@@ -206,7 +206,9 @@ def slack_interactive(request):
                 for player in player_list:
                     print(player)
                     message_request, _ = send_slack_event_confirm(event, player, msg.id)
-                    r = requests.post('https://slack.com/api/chat.postMessage', params=message_request)
+                    # r = requests.post('https://slack.com/api/chat.postMessage', params=message_request)
+                    print(message_request)
+
                 print('message sent to player')
                 # TODO: edit original prompt to confirm sent message
                 return JsonResponse(response)
@@ -256,9 +258,7 @@ def slack_interactive(request):
                                       original_time_stamp,
                                       text='Failed',
                                       blocks=json.dumps(blocks))
-            print(message)
-            # TODO: uncomment these 2 lines to make it send again
-            # r = requests.post('https://slack.com/api/chat.update', params=message)
-            # print(r.content)
+            r = requests.post('https://slack.com/api/chat.update', params=message)
+            print(r.content)
 
     return JsonResponse(response)

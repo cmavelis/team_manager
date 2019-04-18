@@ -216,7 +216,7 @@ def slack_interactive(request):
             attendance_response = user_input['value']
             att_res_display = dict(Attendance.ATTENDANCE_TYPES)[attendance_response]
 
-            msg = get_object_or_404(InteractiveMessage, id=block_id.strip('_')[-1])
+            msg = get_object_or_404(InteractiveMessage, id=block_id.split('_')[-1])
             print('message found')
             attendance = get_object_or_404(Attendance, event=msg.event_id, player=msg.player_id)
             print('attn found')

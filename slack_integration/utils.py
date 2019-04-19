@@ -66,7 +66,7 @@ def give_player_event_dropdowns(channel):
                 "block_id": block_id + "_player",
                 "text": {
                     "type": "mrkdwn",
-                    "text": "Please pick a player"
+                    "text": "Please pick a player and an event"
                 }
             },
             {
@@ -99,35 +99,27 @@ def give_player_event_dropdowns(channel):
                                 "value": str(player.id)
                             } for player in Player.objects.all()
                         ]
+                    },
+                    {
+                        "type": "static_select",
+                        "action_id": "event_id",
+                        "placeholder": {
+                            "type": "plain_text",
+                            "text": "Event",
+                            "emoji": True
+                        },
+                        "options": [
+                            {
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": event.name,
+                                    "emoji": True
+                                },
+                                "value": str(event.id)
+                            } for event in Event.objects.all()
+                        ]
                     }
                 ]
-            },
-            {
-                "type": "section",
-                "block_id": block_id + "_event",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": "Please pick an event"
-                },
-                "accessory": {
-                    "type": "static_select",
-                    "action_id": "event_id",
-                    "placeholder": {
-                        "type": "plain_text",
-                        "text": "Event",
-                        "emoji": True
-                    },
-                    "options": [
-                        {
-                            "text": {
-                                "type": "plain_text",
-                                "text": event.name,
-                                "emoji": True
-                            },
-                            "value": str(event.id)
-                        } for event in Event.objects.all()
-                    ]
-                }
             },
             {
                 "type": "actions",

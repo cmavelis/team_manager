@@ -268,16 +268,7 @@ def slack_interactive(request):
                     "text": "Your response has been recorded as *%s*, thanks!" % att_res_display
                 }
             }]
-            # #failure message
-            # blocks = [
-            #     {
-            #         "type": "section",
-            #         "text": {
-            #             "type": "mrkdwn",
-            #             "text": "Your response could not be recorded."
-            #         }
-            #     }
-            # ]
+
             message = compose_message(payload['container']['channel_id'],
                                       text='Succeeded',
                                       ts=original_time_stamp,

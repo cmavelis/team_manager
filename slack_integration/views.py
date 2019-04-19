@@ -226,11 +226,15 @@ def slack_interactive(request):
                 # ''.join(['\n%s' % p.nickname for p in player_list])
 
                 message = compose_message(payload['container']['channel_id'],
-                                          original_time_stamp,
-                                          text='Sent',
+                                          ts=original_time_stamp,
+                                          text='Deleted',
                                           blocks=json.dumps(blocks))
                 print(message)
                 requests.post('https://slack.com/api/chat.delete', params=message)
+
+                message = compose_message(payload['container']['channel_id'],
+                                          text='Sent',
+                                          blocks=json.dumps(blocks))
                 r = requests.post('https://slack.com/api/chat.postEphemeral', params=message)
                 print(r)
                 return JsonResponse(response)

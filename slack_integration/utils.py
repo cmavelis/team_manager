@@ -4,14 +4,17 @@ from team.models import Event, Player, Attendance
 from team_manager import settings
 
 
-def compose_message(channel, ts, text, blocks):
+def compose_message(channel, text, blocks, ts=False):
     new_message = {
         "token": settings.SLACK_BOT_USER_TOKEN,
         "channel": channel,
-        "ts": ts,
         "text": text,
         "blocks": blocks,
     }
+
+    if ts:
+        new_message['ts'] = ts
+
     return new_message
 
 

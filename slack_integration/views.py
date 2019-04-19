@@ -154,12 +154,11 @@ def slack_commands(request):  # TODO: bring all commands into one view
         return Http404
     print(payload)
     if payload['command'] == '/event_query':
-        new_ephemeral_message = give_player_event_dropdowns(channel=payload['channel_id'],
-                                                            user_id=payload['user_id'])
+        new_ephemeral_message = give_player_event_dropdowns(channel=payload['user_id'])
         # user_id=payload['user'],
         # channel = payload['channel']
         print(new_ephemeral_message)
-        r = requests.post('https://slack.com/api/chat.postEphemeral', params=new_ephemeral_message)
+        r = requests.post('https://slack.com/api/chat.postMessage', params=new_ephemeral_message)
         print(r.content)
         return HttpResponse(status=200)
 

@@ -21,7 +21,8 @@ def send_slack_event_confirm(event, player, msg_id):
         "type": "section",
         "text": {
             "type": "mrkdwn",
-            "text": "We don't have a response from you for *%s*-- can you make it?" % event.name
+            "text": "We don't have a response from you for *%s*.  "
+                    "It's on %s.  Can you make it?" % (event.name, event.date)
         }
     }
 
@@ -65,7 +66,7 @@ def give_player_event_dropdowns(channel):
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": "Please pick a player and an event"
+                    "text": "Please pick a player and an event to query."
                 }
             },
             {
@@ -142,33 +143,3 @@ def give_player_event_dropdowns(channel):
     }
 
     return message
-
-
-# message = {
-#         "token": os.environ["SLACK_TOKEN"],
-#         "channel": player.slack_user_id,
-#         "as_user": False,
-#         "blocks": [
-#             {
-#                 "type": "section",
-#                 "text": {
-#                     "type": "mrkdwn",
-#                     "text": "We don't have a response from you for *%s*-- can you make it?" % event.name
-#                 }
-#             },
-#             {
-#                 "type": "actions",
-#                 "elements": [
-#                     {
-#                         "type": "button",
-#                         "text": {
-#                             "type": "plain_text",
-#                             "text": str(allowed_response),
-#                             "emoji": True
-#                         },
-#                         "value": str(allowed_response)
-#                     } for allowed_response in Attendance.ATTENDANCE_TYPES
-#                 ]
-#             }
-#         ]
-#     }

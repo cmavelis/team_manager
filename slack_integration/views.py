@@ -241,7 +241,8 @@ def slack_interactive(request):
                     'response_type': 'ephemeral',
                     'text': '',
                     'replace_original': True,
-                    'delete_original': True
+                    'delete_original': True,
+                    'as_user': True,
                 })
 
             # add response info to message object

@@ -232,14 +232,15 @@ def slack_interactive(request):
                 # print(r.content)
                 # TODO: uncomment this
                 message = compose_message(channel=payload['container']['channel_id'],
+                                          ts=original_time_stamp,
                                           text='Sent',
                                           blocks=json.dumps(blocks),
                                           user=payload['user']['id'],
                                           as_user=True)
-                r = requests.post('https://slack.com/api/chat.postEphemeral', params=message)
+                r = requests.post('https://slack.com/api/chat.update', params=message)
 
                 return JsonResponse({
-                    'response_type': 'ephemeral',
+                    'response_type': 'message',
                     'text': '',
                     'replace_original': True,
                     'delete_original': True,

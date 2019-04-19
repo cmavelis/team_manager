@@ -217,20 +217,10 @@ def slack_interactive(request):
                     "text": {
                         "type": "mrkdwn",
                         "text": "You've sent requests to the following players:"
-                                + ''.join(['\n%s' % p.nickname for p in player_list])
+                                + ''.join(['\n•%s' % p.nickname for p in player_list])
                     }
                 }]
 
-                # message = compose_message(channel=payload['container']['channel_id'],
-                #                           user=payload['user']['id'],
-                #                           text='deleted',
-                #                           ts=original_time_stamp,
-                #                           as_user=True)
-                # print(message)
-                #
-                # r = requests.post('https://slack.com/api/chat.delete', params=message)
-                # print(r.content)
-                # TODO: uncomment this
                 message = compose_message(channel=payload['container']['channel_id'],
                                           ts=original_time_stamp,
                                           text='Sent',

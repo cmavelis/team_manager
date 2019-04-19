@@ -221,22 +221,22 @@ def slack_interactive(request):
                     }
                 }]
 
-                message = compose_message(channel=payload['container']['channel_id'],
-                                          user=payload['user']['id'],
-                                          text='deleted',
-                                          ts=original_time_stamp,
-                                          as_user=True)
-                print(message)
-
-                r = requests.post('https://slack.com/api/chat.delete', params=message)
-                print(r.content)
-                # TODO: uncomment this
                 # message = compose_message(channel=payload['container']['channel_id'],
-                #                           text='Sent',
-                #                           blocks=json.dumps(blocks),
                 #                           user=payload['user']['id'],
+                #                           text='deleted',
+                #                           ts=original_time_stamp,
                 #                           as_user=True)
-                # r = requests.post('https://slack.com/api/chat.postEphemeral', params=message)
+                # print(message)
+                #
+                # r = requests.post('https://slack.com/api/chat.delete', params=message)
+                # print(r.content)
+                # TODO: uncomment this
+                message = compose_message(channel=payload['container']['channel_id'],
+                                          text='Sent',
+                                          blocks=json.dumps(blocks),
+                                          user=payload['user']['id'],
+                                          as_user=True)
+                r = requests.post('https://slack.com/api/chat.postEphemeral', params=message)
 
                 return JsonResponse({
                     'response_type': 'ephemeral',

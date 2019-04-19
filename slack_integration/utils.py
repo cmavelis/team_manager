@@ -57,10 +57,10 @@ def give_player_event_dropdowns(channel, user_id):
     block_id = "event_rq_dropdowns"
     message = {
         "token": settings.SLACK_BOT_USER_TOKEN,
-        # "channel": channel,
+        "channel": channel,
         "as_user": False,
         "text": "Define your query",
-        # "user": user_id,
+        "user": user_id,
         "blocks": json.dumps([
             {
                 "type": "section",

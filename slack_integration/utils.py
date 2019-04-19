@@ -63,7 +63,6 @@ def give_player_event_dropdowns(channel):
         "blocks": json.dumps([
             {
                 "type": "section",
-                "block_id": block_id + "_player",
                 "text": {
                     "type": "mrkdwn",
                     "text": "Please pick a player and an event"
@@ -71,6 +70,7 @@ def give_player_event_dropdowns(channel):
             },
             {
                 "type": "actions",
+                "block_id": block_id + "_select",
                 "elements": [
                     {
                         "type": "static_select",
@@ -127,6 +127,7 @@ def give_player_event_dropdowns(channel):
                 "elements": [
                     {
                         "type": "button",
+                        "style": "primary",
                         "action_id": "send_message",
                         "text": {
                             "type": "plain_text",

@@ -161,7 +161,7 @@ def slack_commands(request):  # TODO: bring all commands into one view
         print(new_ephemeral_message)
         r = requests.post('https://slack.com/api/chat.postEphemeral', params=new_ephemeral_message)
         print(r.content)
-        return JsonResponse(new_ephemeral_message)
+        return JsonResponse(status=200, data='')
 
 
 @csrf_exempt

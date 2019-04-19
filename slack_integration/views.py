@@ -230,7 +230,7 @@ def slack_interactive(request):
                                           text='Sent',
                                           blocks=json.dumps(blocks))
                 print(message)
-                r = requests.post('https://slack.com/api/chat.update', params=message)
+                r = requests.post('https://slack.com/api/chat.delete', params=message)
                 print(r)
                 return JsonResponse(response)
 

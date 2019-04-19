@@ -67,35 +67,40 @@ def give_player_event_dropdowns(channel):
                 "text": {
                     "type": "mrkdwn",
                     "text": "Please pick a player"
-                },
-                "accessory": {
-                    "type": "static_select",
-                    "action_id": "player_id",
-                    "placeholder": {
-                        "type": "plain_text",
-                        "text": "Player",
-                        "emoji": True
-                    },
-                    "options": [
-                        {
-                            "text": {
-                                "type": "plain_text",
-                                "text": "All pending players",
-                                "emoji": True
-                            },
-                            "value": "0"
-                        }
-                    ] + [
-                        {
-                            "text": {
-                                "type": "plain_text",
-                                "text": player.nickname,
-                                "emoji": True
-                            },
-                            "value": str(player.id)
-                        } for player in Player.objects.all()
-                    ]
                 }
+            },
+            {
+                "type": "actions",
+                "elements": [
+                    {
+                        "type": "static_select",
+                        "action_id": "player_id",
+                        "placeholder": {
+                            "type": "plain_text",
+                            "text": "Player",
+                            "emoji": True
+                        },
+                        "options": [
+                            {
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "All pending players",
+                                    "emoji": True
+                                },
+                                "value": "0"
+                            }
+                        ] + [
+                            {
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": player.nickname,
+                                    "emoji": True
+                                },
+                                "value": str(player.id)
+                            } for player in Player.objects.all()
+                        ]
+                    }
+                ]
             },
             {
                 "type": "section",

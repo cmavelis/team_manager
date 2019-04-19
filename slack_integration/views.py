@@ -218,27 +218,27 @@ def slack_interactive(request):
                     "text": {
                         "type": "mrkdwn",
                         "text": "You've sent requests to the following players:"
+                                + ''.join(['\n%s' % p.nickname for p in player_list])
                     }
                 }]
 
                 # TODO: add this back into above
-                # +
-                # ''.join(['\n%s' % p.nickname for p in player_list])
+                # + ''.join(['\n%s' % p.nickname for p in player_list])
 
                 message = compose_message(channel=payload['container']['channel_id'],
-                                          text='Deleted',
                                           ts=original_time_stamp,)
+                print(message)
 
-                requests.post('https://slack.com/api/chat.delete', params=message)
+                r = requests.post('https://slack.com/api/chat.delete', params=message)
+                print(r)
 
                 message = compose_message(channel=payload['container']['channel_id'],
                                           text='Sent',
                                           blocks=json.dumps(blocks),
                                           user=payload['user']['id'],
                                           as_user=True)
-                print(message)
                 r = requests.post('https://slack.com/api/chat.postEphemeral', params=message)
-                print(r)
+
                 return JsonResponse(response)
 
             # add response info to message object

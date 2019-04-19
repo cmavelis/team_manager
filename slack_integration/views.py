@@ -231,9 +231,11 @@ def slack_interactive(request):
 
                 requests.post('https://slack.com/api/chat.delete', params=message)
 
-                message = compose_message(channel=payload['user']['id'],
+                message = compose_message(channel=payload['container']['channel_id'],
                                           text='Sent',
-                                          blocks=json.dumps(blocks))
+                                          blocks=json.dumps(blocks),
+                                          user=payload['user']['id'],
+                                          as_user=True)
                 print(message)
                 r = requests.post('https://slack.com/api/chat.postEphemeral', params=message)
                 print(r)
@@ -281,8 +283,8 @@ def slack_interactive(request):
             #     }
             # ]
             message = compose_message(payload['container']['channel_id'],
-                                      original_time_stamp,
                                       text='Succeeded',
+                                      ts=original_time_stamp,
                                       blocks=json.dumps(blocks))
             r = requests.post('https://slack.com/api/chat.update', params=message)
             print(r.content)

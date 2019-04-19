@@ -216,7 +216,7 @@ def slack_interactive(request):
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": "You've sent requests to the following players about *%s*:" % event.name
+                        "text": "You've sent a request to the following player(s) about *%s*:" % event.name
                                 + ''.join(['\n• %s' % p.nickname for p in player_list])
                     }
                 }]

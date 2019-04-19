@@ -224,7 +224,8 @@ def slack_interactive(request):
 
                 message = compose_message(channel=payload['container']['channel_id'],
                                           text='deleted',
-                                          ts=original_time_stamp,)
+                                          ts=original_time_stamp,
+                                          as_user=True)
                 print(message)
 
                 r = requests.post('https://slack.com/api/chat.delete', params=message)

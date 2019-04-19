@@ -22,7 +22,7 @@ def send_slack_event_confirm(event, player, msg_id):
         "text": {
             "type": "mrkdwn",
             "text": "We don't have a response from you for *%s*.  "
-                    "It's on %s.  Can you make it?" % (event.name, event.date)
+                    "It's on %s.  Can you make it?" % (event.name, event.date.strftime('%B %d %Y'))
         }
     }
 

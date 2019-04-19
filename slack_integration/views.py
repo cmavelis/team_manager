@@ -160,7 +160,7 @@ def slack_commands(request):  # TODO: bring all commands into one view
         # channel = payload['channel']
         print(new_ephemeral_message)
         r = requests.post('https://slack.com/api/chat.postEphemeral', params=new_ephemeral_message)
-        print(r)
+        print(r.content)
         return JsonResponse(new_ephemeral_message)
 
 
@@ -223,11 +223,12 @@ def slack_interactive(request):
                 }]
 
                 message = compose_message(channel=payload['container']['channel_id'],
+                                          text='deleted',
                                           ts=original_time_stamp,)
                 print(message)
 
                 r = requests.post('https://slack.com/api/chat.delete', params=message)
-                print(r)
+                print(r.content)
                 # TODO: uncomment this
                 # message = compose_message(channel=payload['container']['channel_id'],
                 #                           text='Sent',

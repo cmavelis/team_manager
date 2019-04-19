@@ -237,7 +237,12 @@ def slack_interactive(request):
                 #                           as_user=True)
                 # r = requests.post('https://slack.com/api/chat.postEphemeral', params=message)
 
-                return JsonResponse(response)
+                return JsonResponse({
+                    'response_type': 'ephemeral',
+                    'text': '',
+                    'replace_original': True,
+                    'delete_original': True
+                })
 
             # add response info to message object
             action_value = payload['actions'][0]['selected_option']['value']

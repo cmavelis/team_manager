@@ -223,6 +223,7 @@ def slack_interactive(request):
                 }]
 
                 message = compose_message(channel=payload['container']['channel_id'],
+                                          user=payload['user']['id'],
                                           text='deleted',
                                           ts=original_time_stamp,
                                           as_user=True)

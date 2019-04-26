@@ -4,6 +4,12 @@ from . import views
 
 app_name = 'slack_integration'
 urlpatterns = [
+    # slack/interactive/  slack interactive message endpoint
+    path('interactive/', views.slack_interactive, name='slack_interactive'),
+
+    # slack/commands/  slack commands endpoint
+    path('commands/', views.slack_commands, name='slack_commands'),
+
     # slack/test/  slack test message
     path('test/', views.slack_test, name='slack_test'),
 

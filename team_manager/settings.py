@@ -32,14 +32,23 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
-    'team',
-    'slack_integration',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+
+    # 3rd party
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+
+    # local
+    'team',
+    'slack_integration',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -86,10 +95,11 @@ DATABASES = {
 }
 
 
-AUTH_USER_MODEL = 'team.User'
+AUTH_USER_MODEL = 'users.AppUser'
 
 # Redirect to home URL after login (Default redirects to /accounts/profile/)
 LOGIN_REDIRECT_URL = '/team/'
+ACCOUNT_LOGOUT_REDIRECT_URL = '/team/'
 
 # LOGGING CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -178,4 +188,24 @@ STATICFILES_STORAGE = 'whitenoise.django.CompressedManifestStaticFilesStorage'
 
 # Activate Django-Heroku.
 django_heroku.settings(locals())
+
+# allauth options
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+AUTHENTICATION_BACKENDS = (
+    # Needed to login by username in Django admin, regardless of `allauth`
+    "django.contrib.auth.backends.ModelBackend",
+
+    # `allauth` specific authentication methods, such as login by e-mail
+    "allauth.account.auth_backends.AuthenticationBackend",
+)
+
+SITE_ID = 1
+
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = False
+ACCOUNT_SESSION_REMEMBER = True
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_UNIQUE_EMAIL = True
 

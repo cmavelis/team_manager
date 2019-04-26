@@ -100,11 +100,6 @@ def player_edit_attendance(request, player_nickname, event_name):
     return render(request, 'team/attendance_form.html', {'form': form})
 
 
-def redirect_to_signup(request):
-    response = redirect('/team/signup/')
-    return response
-
-
 def redirect_to_login(request):
     response = redirect('/accounts/login/')
     return response
@@ -140,9 +135,9 @@ def signup(request):
             form.save()
             # user.refresh_from_db()  # load the profile instance created by the signal
             # user.profile.birth_date = form.cleaned_data.get('birth_date')
-            username = form.cleaned_data.get('username')
+            email = form.cleaned_data.get('email')
             raw_password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=raw_password)
+            user = authenticate(username=email, password=raw_password)
             login(request, user)
             return redirect('team:index')
     else:

@@ -67,30 +67,25 @@ def slack_register(request):
         return Http404
     print(payload)
     if payload['command'] == '/register':
-        nickname = payload['text']
-        found_player = get_object_or_404(Player, nickname=nickname)
-
+        slack_user_id = payload['user_id']
+        response = {}
+        try:
+            found_player = Player.objects.get(slack_user_id=slack_user_id)
+        except Player.DoesNotExist:
+            requests.get('https://slack.com/api/users.info', params= #see https://api.slack.com/methods/users.info
+                         )
+            #TODO get email address of command giver
+        response['attachments'] = [
+            {
+                'text': 'Account: {}'.format(found_player.user)
+            }
+        ]
         if not found_player.slack_user_id:
             found_player.slack_user_id = payload['user_id']
             found_player.save()
-            response = {
-                'text': 'Your account has been linked.',
-                'attachments': [
-                    {
-                        'text': 'Webapp username: {}'.format(found_player.user)
-                    }
-                ]
-            }
+            response['text'] = 'Your account has been linked.'
         else:
-            response = {
-                'text': 'This account is already linked to the webapp.',
-                'attachments': [
-                    {
-                        'text': 'Webapp username: {}'.format(found_player.user)
-                    }
-                ]
-            }
-
+            response['text'] = 'This account is already linked to the webapp.'
         return JsonResponse(response)
 
     else:

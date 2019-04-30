@@ -3,6 +3,7 @@ import json
 import logging
 
 from django.shortcuts import get_object_or_404
+from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonResponse
 from django.utils import timezone
@@ -168,6 +169,26 @@ def slack_commands(request):  # TODO: bring all commands into one view
         new_ephemeral_message = give_player_event_dropdowns(channel=payload['user_id'])
         # user_id=payload['user'],
         # channel = payload['channel']
+        print(new_ephemeral_message)
+        r = requests.post('https://slack.com/api/chat.postMessage', params=new_ephemeral_message)
+        print(r.content)
+        return HttpResponse(status=200)
+
+
+# TODO: replace above with this
+class SlackCommandView(View):
+    def post(self, request):
+        payload = request.POST
+        command_name = payload['command'][1:].split(' ')[0]
+        handler = getattr(self, 'handle_%s' % command_name)
+        if not handler:
+            return Http404
+        print('handling command: %s' % command_name)
+        return handler(payload)
+
+    @staticmethod
+    def handle_event_query(payload):
+        new_ephemeral_message = give_player_event_dropdowns(channel=payload['user_id'])
         print(new_ephemeral_message)
         r = requests.post('https://slack.com/api/chat.postMessage', params=new_ephemeral_message)
         print(r.content)

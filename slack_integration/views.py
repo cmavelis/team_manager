@@ -10,10 +10,13 @@ from django.utils import timezone
 from .slack_messages import create_event
 from .utils import send_slack_event_confirm, give_player_event_dropdowns, compose_message
 from team.models import Event, Player, Attendance
+from users.models import AppUser
 from team_manager import settings
 from slack_integration.models import InteractiveMessage
 
 logger = logging.getLogger(__name__)
+
+# TODO: add token verification to all views (use mixin?)
 
 
 @csrf_exempt
@@ -69,23 +72,36 @@ def slack_register(request):
     if payload['command'] == '/register':
         slack_user_id = payload['user_id']
         response = {}
+
+        # if this Slack ID is already registered, tell the user that
         try:
-            found_player = Player.objects.get(slack_user_id=slack_user_id)
+            player = Player.objects.get(slack_user_id=slack_user_id)
+            response['text'] = 'Your Slack account is already linked' \
+                               ' to the web app with the email *%s*' % player.user.email
+
+        # if this Slack ID isn't registered to an AppUser yet
         except Player.DoesNotExist:
-            requests.get('https://slack.com/api/users.info', params= #see https://api.slack.com/methods/users.info
-                         )
-            #TODO get email address of command giver
-        response['attachments'] = [
-            {
-                'text': 'Account: {}'.format(found_player.user)
-            }
-        ]
-        if not found_player.slack_user_id:
-            found_player.slack_user_id = payload['user_id']
-            found_player.save()
-            response['text'] = 'Your account has been linked.'
-        else:
-            response['text'] = 'This account is already linked to the webapp.'
+            user_info_response = requests.get('https://slack.com/api/users.info',
+                                              params={'user': slack_user_id, 'token': settings.SLACK_BOT_USER_TOKEN}
+                                              )  # see https://api.slack.com/methods/users.info
+            user_email = user_info_response.content['user']['profile']['email']
+
+            # look for a user with the Slack-registered email to register with
+            try:
+                player = Player.objects.get(user__email=user_email)
+                response['text'] = 'Your Slack account has been linked' \
+                                   ' to the web app with the email *%s*' % player.user.email
+
+            # otherwise create a user and link the Slack account
+            except Player.DoesNotExist:
+                new_user = AppUser.objects.create_user(email=user_email)
+                player = Player.objects.get(user=new_user)
+                response['text'] = 'A web app account has been created for you' \
+                                   ' with the email *%s* and linked to your Slack account' % player.user.email
+            player.slack_user_id = slack_user_id
+            player.save()
+            # TODO: after creating AppUser and Player, send email with password
+
         return JsonResponse(response)
 
     else:

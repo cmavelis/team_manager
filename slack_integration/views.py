@@ -85,8 +85,8 @@ def slack_register(request):
             user_info_response = requests.get('https://slack.com/api/users.info',
                                               params={'user': slack_user_id, 'token': settings.SLACK_BOT_USER_TOKEN}
                                               )  # see https://api.slack.com/methods/users.info
-            print(user_info_response.content)
-            user_email = user_info_response.content['user']['profile']['email']
+            print(user_info_response.json())
+            user_email = user_info_response.json()['user']['profile']['email']
 
             # look for a user with the Slack-registered email to register with
             try:

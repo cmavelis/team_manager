@@ -86,7 +86,8 @@ def slack_register(request):
                                               params={'user': slack_user_id, 'token': settings.SLACK_BOT_USER_TOKEN}
                                               )  # see https://api.slack.com/methods/users.info
             print(user_info_response.json())
-            user_email = user_info_response.json()['user']['profile']['email']
+            slack_profile = user_info_response.json()['user']['profile']
+            user_email = slack_profile['email']
 
             # look for a user with the Slack-registered email to register with
             try:
@@ -96,7 +97,7 @@ def slack_register(request):
 
             # otherwise create a user and link the Slack account
             except Player.DoesNotExist:
-                new_user = AppUser.objects.create_user(email=user_email)
+                new_user = AppUser.objects.create_user(email=user_email, full_name=slack_profile['real_name'])
                 player = Player.objects.get(user=new_user)
                 response['text'] = 'A web app account has been created for you' \
                                    ' with the email *%s* and linked to your Slack account' % player.user.email

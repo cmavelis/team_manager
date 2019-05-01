@@ -60,7 +60,7 @@ class AppUser(AbstractBaseUser, PermissionsMixin):
     a username.
     """
     email = models.EmailField(_('email address'), max_length=254, unique=True)
-    # full_name = models.CharField(_('full name'), max_length=100, blank=True)
+    full_name = models.CharField(_('full name'), max_length=100, blank=True)
     is_staff = models.BooleanField(
         _('staff status'),
         default=False,

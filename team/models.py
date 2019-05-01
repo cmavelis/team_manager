@@ -43,7 +43,7 @@ class Player(models.Model):
     first_name = models.CharField(max_length=30)  # TODO: phase name out from Player, store in User
     last_name = models.CharField(max_length=30)  # TODO: or just reference the User fields here?
     # Players will be identified by nickname throughout the model
-    nickname = models.CharField(max_length=30, blank=True)
+    nickname = models.CharField(max_length=100, blank=True)
     gender_line = models.CharField(max_length=1, choices=GENDER_LINES)
     field_position = models.CharField(max_length=1, choices=FIELD_POSITIONS)
 
@@ -55,7 +55,7 @@ class Player(models.Model):
 
     def save(self, *args, **kwargs):
         if getattr(self, 'nickname', None) is '':  # check that current instance has 'nickname' attribute left blank
-            self.nickname = self.user.email  # assign 'nickname' to be full name
+            self.nickname = self.user.full_name  # assign 'nickname' to be full name
         super(Player, self).save(*args, **kwargs)  # Call the "real" save() method.
 
     # link the django user

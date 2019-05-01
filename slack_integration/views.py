@@ -3,6 +3,7 @@ import json
 import logging
 
 from django.shortcuts import get_object_or_404
+from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonResponse
 from django.utils import timezone
@@ -10,10 +11,13 @@ from django.utils import timezone
 from .slack_messages import create_event
 from .utils import send_slack_event_confirm, give_player_event_dropdowns, compose_message
 from team.models import Event, Player, Attendance
+from users.models import AppUser
 from team_manager import settings
 from slack_integration.models import InteractiveMessage
 
 logger = logging.getLogger(__name__)
+
+# TODO: add token verification to all views (use mixin?)
 
 
 @csrf_exempt
@@ -67,29 +71,37 @@ def slack_register(request):
         return Http404
     print(payload)
     if payload['command'] == '/register':
-        nickname = payload['text']
-        found_player = get_object_or_404(Player, nickname=nickname)
+        slack_user_id = payload['user_id']
+        response = {}
 
-        if not found_player.slack_user_id:
-            found_player.slack_user_id = payload['user_id']
-            found_player.save()
-            response = {
-                'text': 'Your account has been linked.',
-                'attachments': [
-                    {
-                        'text': 'Webapp username: {}'.format(found_player.user)
-                    }
-                ]
-            }
-        else:
-            response = {
-                'text': 'This account is already linked to the webapp.',
-                'attachments': [
-                    {
-                        'text': 'Webapp username: {}'.format(found_player.user)
-                    }
-                ]
-            }
+        # if this Slack ID is already registered, tell the user that
+        try:
+            player = Player.objects.get(slack_user_id=slack_user_id)
+            response['text'] = 'Your Slack account is already linked' \
+                               ' to the web app with the email *%s*' % player.user.email
+
+        # if this Slack ID isn't registered to an AppUser yet
+        except Player.DoesNotExist:
+            user_info_response = requests.get('https://slack.com/api/users.info',
+                                              params={'user': slack_user_id, 'token': settings.SLACK_BOT_USER_TOKEN}
+                                              )  # see https://api.slack.com/methods/users.info
+            user_email = user_info_response.content['user']['profile']['email']
+
+            # look for a user with the Slack-registered email to register with
+            try:
+                player = Player.objects.get(user__email=user_email)
+                response['text'] = 'Your Slack account has been linked' \
+                                   ' to the web app with the email *%s*' % player.user.email
+
+            # otherwise create a user and link the Slack account
+            except Player.DoesNotExist:
+                new_user = AppUser.objects.create_user(email=user_email)
+                player = Player.objects.get(user=new_user)
+                response['text'] = 'A web app account has been created for you' \
+                                   ' with the email *%s* and linked to your Slack account' % player.user.email
+            player.slack_user_id = slack_user_id
+            player.save()
+            # TODO: after creating AppUser and Player, send email with password
 
         return JsonResponse(response)
 
@@ -157,6 +169,26 @@ def slack_commands(request):  # TODO: bring all commands into one view
         new_ephemeral_message = give_player_event_dropdowns(channel=payload['user_id'])
         # user_id=payload['user'],
         # channel = payload['channel']
+        print(new_ephemeral_message)
+        r = requests.post('https://slack.com/api/chat.postMessage', params=new_ephemeral_message)
+        print(r.content)
+        return HttpResponse(status=200)
+
+
+# TODO: replace above with this
+class SlackCommandView(View):
+    def post(self, request):
+        payload = request.POST
+        command_name = payload['command'][1:].split(' ')[0]
+        handler = getattr(self, 'handle_%s' % command_name)
+        if not handler:
+            return Http404
+        print('handling command: %s' % command_name)
+        return handler(payload)
+
+    @staticmethod
+    def handle_event_query(payload):
+        new_ephemeral_message = give_player_event_dropdowns(channel=payload['user_id'])
         print(new_ephemeral_message)
         r = requests.post('https://slack.com/api/chat.postMessage', params=new_ephemeral_message)
         print(r.content)

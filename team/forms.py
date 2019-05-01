@@ -1,7 +1,9 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.forms import ModelForm
-from .models import Player, Attendance, User
+
+from users.models import AppUser
+from .models import Player, Attendance
 
 
 class PlayerForm(ModelForm):
@@ -24,16 +26,13 @@ class AttendanceForm(ModelForm):
 
 
 class SignUpForm(UserCreationForm):
-    # TODO: add fields
-    # birth_date = forms.DateField(help_text='Required. Format: YYYY-MM-DD')
-
     class Meta:
-        model = User
-        # TODO
+        model = AppUser
+        # TODO make this a combo form that puts extra fields into the Player model
         fields = [
-                'username',
+                'email',
                 'password1',
                 'password2',
-                'first_name',
-                'last_name',
+                # 'first_name',
+                # 'last_name',
                 ]

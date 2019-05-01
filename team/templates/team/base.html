@@ -6,8 +6,11 @@
 
 <h1>Baltimore Bench</h1>
 
-<a href="{% url 'team:index' %}">Home</a>
-<a href="{% url 'team:self_edit' %}">Edit my info</a>
+{% if user.is_authenticated %}
+    <a href="{% url 'team:index' %}">Home</a>
+    <a href="{% url 'team:self_edit' %}">Edit my info</a>
+    <a href="{% url 'logout' %}">Log out</a>
+{% endif %}
 
 
 <div id="content">

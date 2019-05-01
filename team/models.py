@@ -1,12 +1,7 @@
 from django.db import models
 from django.conf import settings
-from django.contrib.auth.models import AbstractUser
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
-
-class User(AbstractUser):
-    pass
 
 
 class Event(models.Model):
@@ -60,7 +55,7 @@ class Player(models.Model):
 
     def save(self, *args, **kwargs):
         if getattr(self, 'nickname', None) is '':  # check that current instance has 'nickname' attribute left blank
-            self.nickname = self.user.get_full_name()  # assign 'nickname' to be full name
+            self.nickname = self.user.email  # assign 'nickname' to be full name
         super(Player, self).save(*args, **kwargs)  # Call the "real" save() method.
 
     # link the django user

@@ -40,11 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
 
-    # 3rd party
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-
     # local
     'team',
     'slack_integration',
@@ -189,16 +184,7 @@ STATICFILES_STORAGE = 'whitenoise.django.CompressedManifestStaticFilesStorage'
 # Activate Django-Heroku.
 django_heroku.settings(locals())
 
-# allauth options
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-AUTHENTICATION_BACKENDS = (
-    # Needed to login by username in Django admin, regardless of `allauth`
-    "django.contrib.auth.backends.ModelBackend",
-
-    # `allauth` specific authentication methods, such as login by e-mail
-    "allauth.account.auth_backends.AuthenticationBackend",
-)
 
 SITE_ID = 1
 

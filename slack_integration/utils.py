@@ -21,7 +21,7 @@ def send_slack_event_confirm(event, player, msg_id):
         "type": "section",
         "text": {
             "type": "mrkdwn",
-            "text": "We don't have a response from you for *%s*.  "
+            "text": "Your response has been requested for the event: *%s*\n"
                     "It's on %s.  Can you make it?" % (event.name, event.date.strftime('%B %d %Y'))
         }
     }
@@ -30,7 +30,7 @@ def send_slack_event_confirm(event, player, msg_id):
         "token": settings.SLACK_BOT_USER_TOKEN,
         "channel": player.slack_user_id,
         "as_user": True,
-        "text": "Your response is requested",
+        "text": "Your response has been requested",
         "blocks": json.dumps([
             question_block,
             {

@@ -111,55 +111,6 @@ def slack_register(request):
         return Http404
 
 
-@csrf_exempt
-def slack_my_events(request):
-    if request.method == 'POST':
-        payload = request.POST
-    else:
-        return Http404
-
-    if payload['command'] == '/my_events':
-        slack_user_id = payload['user_id']
-        try:
-            found_player = Player.objects.get(slack_user_id=slack_user_id)
-        except Player.DoesNotExist:
-            return JsonResponse({
-                'text': 'Your Webapp account wasn\'t found.  '
-                        'Have you registered your Slack ID yet? '
-                        '\nUse /register [webapp nickname]',
-            })
-
-        event_list = Event.objects.all().order_by('date')
-        attendance = found_player.attendance_set.all()
-        attendance_entries = []
-        for event in event_list:
-            try:
-                attendance_entries.append(attendance.get(event=event.id).get_status_display())
-            except Attendance.DoesNotExist:
-                attendance_entries.append('ERR')
-
-        to_display = zip(event_list, attendance_entries)
-
-        event_message = '*Event: Response*'
-        for pair in to_display:
-            pair_as_string = '\n%s: %s' % (pair[:])
-            event_message += pair_as_string
-
-        response = {
-            'text': 'Your event responses:',
-            'attachments': [
-                {
-                    'text': event_message
-                }
-            ]
-        }
-
-        return JsonResponse(response)
-
-    else:
-        return Http404
-
-
 class SlackCommandView(View):
     def post(self, request):
         payload = request.POST
@@ -201,19 +152,19 @@ class SlackCommandView(View):
 
         to_display = zip(event_list, attendance_entries)
 
-        event_message = '*Event: Response*'
+        attachments = []
         for pair in to_display:
-            pair_as_string = '\n*%s*: %s' % (pair[:])
-            event_message += pair_as_string
+            event = pair[0]
+            event_and_attendance_string = '*%s*: %s\n' % (pair[:])
 
-        # TODO: add an option for editing responses to this response
+            attachments.append({'text':
+                                event_and_attendance_string + event.date.strftime('%B %d %Y')
+                                })
+
+        # TODO: add an option for editing responses attached to this message
         response = {
             'text': 'Your event responses:',
-            'attachments': [
-                {
-                    'text': event_message
-                }
-            ]
+            'attachments': attachments
         }
 
         return JsonResponse(response)

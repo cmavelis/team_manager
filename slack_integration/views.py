@@ -179,6 +179,7 @@ def slack_commands(request):  # TODO: bring all commands into one view
 
 # TODO: replace above with this
 class SlackCommandView(View):
+    @csrf_exempt
     def post(self, request):
         payload = request.POST
         command_name = payload['command'][1:].split(' ')[0]

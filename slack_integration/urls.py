@@ -8,7 +8,7 @@ urlpatterns = [
     path('interactive/', views.slack_interactive, name='slack_interactive'),
 
     # slack/commands/  slack commands endpoint
-    path('commands/', views.slack_commands, name='slack_commands'),
+    path('commands/', views.SlackCommandView.as_view(), name='slack_commands'),
 
     # slack/test/  slack test message
     path('test/', views.slack_test, name='slack_test'),

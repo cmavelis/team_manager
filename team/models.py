@@ -46,6 +46,10 @@ class Player(models.Model):
     nickname = models.CharField(max_length=100, blank=True)
     gender_line = models.CharField(max_length=1, choices=GENDER_LINES)
     field_position = models.CharField(max_length=1, choices=FIELD_POSITIONS)
+    # captain status allows the ability to send queries
+    captain_status = models.BooleanField
+    # active denotes whether the player should receive queries
+    active = models.BooleanField
 
     # many-to-many relationship will be handled through the Attendance Class, a key component of this app
     attending = models.ManyToManyField(Event, through='Attendance')
@@ -70,8 +74,6 @@ def create_player(sender, instance, created, **kwargs):
     if created:
         Player.objects.create(
             user=instance,
-            # first_name=instance.first_name,
-            # last_name=instance.last_name,
         )
 
 
@@ -82,8 +84,6 @@ def save_player(sender, instance, **kwargs):
     except Player.DoesNotExist:
         Player.objects.create(
             user=instance,
-            # first_name=instance.first_name,
-            # last_name=instance.last_name,
         )
 
 
@@ -93,12 +93,10 @@ class Attendance(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
 
     # possible responses for Players to fill out their attendance
-    # TODO: differentiate No into Excused/Absent?
     ATTENDANCE_TYPES = (
         ('Y', 'Yes',),
         ('N', 'No',),
         ('U', 'Unsure',),
-        ('I', 'Injured',),
         ('P', 'Pending response',),
     )
     status = models.CharField(max_length=1, choices=ATTENDANCE_TYPES, default='P')

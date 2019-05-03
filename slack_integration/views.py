@@ -152,19 +152,18 @@ class SlackCommandView(View):
 
         to_display = zip(event_list, attendance_entries)
 
-        attachments = []
+        attachment_text = ''
         for pair in to_display:
             event = pair[0]
             event_and_attendance_string = '*%s*: %s\n' % (pair[:])
-
-            attachments.append({'text':
-                                event_and_attendance_string + event.date.strftime('%B %d %Y')
-                                })
+            attachment_text += event_and_attendance_string + event.date.strftime('%B %d %Y') + '\n\n'
 
         # TODO: add an option for editing responses attached to this message
         response = {
             'text': 'Your event responses:',
-            'attachments': attachments
+            'attachments': [
+                {'text': attachment_text}
+            ]
         }
 
         return JsonResponse(response)

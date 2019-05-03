@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.decorators.csrf import csrf_exempt
 
 from . import views
 
@@ -8,7 +9,7 @@ urlpatterns = [
     path('interactive/', views.slack_interactive, name='slack_interactive'),
 
     # slack/commands/  slack commands endpoint
-    path('commands/', views.SlackCommandView.as_view(), name='slack_commands'),
+    path('commands/', csrf_exempt(views.SlackCommandView.as_view()), name='slack_commands'),
 
     # slack/test/  slack test message
     path('test/', views.slack_test, name='slack_test'),

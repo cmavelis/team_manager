@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonResponse
-from django.utils import timezone
+from django.utils.decorators import method_decorator
 
 from .slack_messages import create_event
 from .utils import send_slack_event_confirm, give_player_event_dropdowns, compose_message
@@ -179,7 +179,7 @@ def slack_commands(request):  # TODO: bring all commands into one view
 
 # TODO: replace above with this
 class SlackCommandView(View):
-    @csrf_exempt
+    # @method_decorator(csrf_exempt)
     def post(self, request):
         payload = request.POST
         command_name = payload['command'][1:].split(' ')[0]

@@ -145,7 +145,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    'api.slack.com'
+    'slack.com'
 ]
 
 # SLACK API Configurations

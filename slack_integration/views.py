@@ -203,7 +203,7 @@ def slack_interactive(request):
             if action_id == 'send_message':
                 # 0 means all pending events
                 if msg.event_id == 0:
-                    event_list = [Event.objects.all()]
+                    event_list = list(Event.objects.all())
                 else:
                     event_list = [Event.objects.get(id=msg.event_id)]
                 print(event_list, "  whole event list")

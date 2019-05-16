@@ -47,9 +47,9 @@ class Player(models.Model):
     gender_line = models.CharField(max_length=1, choices=GENDER_LINES)
     field_position = models.CharField(max_length=1, choices=FIELD_POSITIONS)
     # captain status allows the ability to send queries
-    captain_status = models.BooleanField
+    captain_status = models.BooleanField(default=False)
     # active denotes whether the player should receive queries
-    active = models.BooleanField
+    active = models.BooleanField(default=True)
 
     # many-to-many relationship will be handled through the Attendance Class, a key component of this app
     attending = models.ManyToManyField(Event, through='Attendance')

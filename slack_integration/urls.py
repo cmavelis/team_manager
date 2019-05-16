@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.decorators.csrf import csrf_exempt
 
 from . import views
 
@@ -7,17 +8,14 @@ urlpatterns = [
     # slack/interactive/  slack interactive message endpoint
     path('interactive/', views.slack_interactive, name='slack_interactive'),
 
-    # slack/commands/  slack commands endpoint
-    path('commands/', views.slack_commands, name='slack_commands'),
+    # slack/commands/  slack slash commands endpoint
+    path('commands/', csrf_exempt(views.SlackCommandView.as_view()), name='slack_commands'),
 
     # slack/test/  slack test message
     path('test/', views.slack_test, name='slack_test'),
 
     # slack/create_event/  create an event from slack
     path('create_event/', views.slack_create_event, name='slack_create_event'),
-
-    # slack/my_events/  show events from slack
-    path('my_events/', views.slack_my_events, name='slack_my_events'),
 
     # slack/register/  register slack user id to webapp account
     path('register/', views.slack_register, name='slack_register')

@@ -220,7 +220,7 @@ def slack_interactive(request):
                                                                      status__in=['P', 'U'],
                                                                      player__slack_user_id__isnull=False)):
                         print(player)
-                        message_request, _ = send_slack_event_confirm(attendance.event_id, player)
+                        message_request, _ = send_slack_event_confirm(attendance.event, player)
                         r = requests.post('https://slack.com/api/chat.postMessage', params=message_request)
                         print('message sent to player')
                         messaged_list.add(player)

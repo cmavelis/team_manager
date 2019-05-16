@@ -206,8 +206,10 @@ def slack_interactive(request):
                     event_list = Event.objects.all()
                 else:
                     event_list = [Event.objects.get(id=msg.event_id)]
+                print(f"{event_list = }")
 
                 for event in event_list:
+                    print(f"{event = }")
                     # 0 means all pending players
                     if msg.player_id == 0:
                         all_pending_attendance = Attendance.objects.filter(event=event,

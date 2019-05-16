@@ -201,8 +201,7 @@ def slack_interactive(request):
 
             # sending query when button is pressed
             if action_id == 'send_message':
-                event = ''
-                player_list = []
+                messaged_list = set()
                 # 0 means all pending events
                 if msg.event_id == 0:
                     event_list = list(Event.objects.all().order_by('date'))
@@ -210,31 +209,30 @@ def slack_interactive(request):
                     event_list = [Event.objects.get(id=msg.event_id)]
                 print(event_list, "  whole event list")
 
-                for event in event_list:
-                    print(event, "  in event list")
-                    # 0 means all pending players
-                    if msg.player_id == 0:
-                        all_pending_attendance = Attendance.objects.filter(event=event,
-                                                                           status__in=['P', 'U'],
-                                                                           player__slack_user_id__isnull=False)
-                        player_list = [attendance.player for attendance in all_pending_attendance]
-                    else:
-                        player_list = [Player.objects.get(id=msg.player_id)]
+                # 0 means all pending players
+                if msg.player_id == 0:
+                    player_list = list(Player.objects.all())
+                else:
+                    player_list = [Player.objects.get(id=msg.player_id)]
 
-                    for player in player_list:
+                for player in player_list:
+                    for attendance in list(Attendance.objects.filter(event__in=event_list,
+                                                                     status__in=['P', 'U'],
+                                                                     player__slack_user_id__isnull=False)):
                         print(player)
-                        message_request, _ = send_slack_event_confirm(event, player)
+                        message_request, _ = send_slack_event_confirm(attendance.event_id, player)
                         r = requests.post('https://slack.com/api/chat.postMessage', params=message_request)
                         print('message sent to player')
+                        messaged_list.add(player)
 
                 # update request text box to show what happened
-                event_text = 'All pending events' if msg.event_id == 0 else event.name
+                event_text = 'All pending events' if msg.event_id == 0 else event_list[0].name
                 blocks = [{
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
                         "text": "You've sent a request to the following player(s) about *%s*:" % event_text
-                                + ''.join(['\n• %s' % p.nickname for p in player_list])
+                                + ''.join(['\n• %s' % p.nickname for p in messaged_list])
                     }
                 }]
 

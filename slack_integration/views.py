@@ -202,9 +202,11 @@ def slack_interactive(request):
             # sending query when button is pressed
             if action_id == 'send_message':
                 messaged_list = set()
+                status_list = ['P', 'Y', 'N', 'U']
                 # 0 means all pending events
                 if msg.event_id == 0:
                     event_list = list(Event.objects.all().order_by('date'))
+                    status_list = ['P', 'U']
                 else:
                     event_list = [Event.objects.get(id=msg.event_id)]
                 print(event_list, "  whole event list")
@@ -212,6 +214,7 @@ def slack_interactive(request):
                 # 0 means all pending players
                 if msg.player_id == 0:
                     player_list = list(Player.objects.all())
+                    status_list = ['P', 'U']
                 else:
                     player_list = [Player.objects.get(id=msg.player_id)]
 
@@ -219,7 +222,7 @@ def slack_interactive(request):
                     print(player)
                     for attendance in list(Attendance.objects.filter(player=player,
                                                                      event__in=event_list,
-                                                                     status__in=['P', 'U'],
+                                                                     status__in=status_list,
                                                                      player__slack_user_id__isnull=False)):
                         message_request, _ = send_slack_event_confirm(attendance.event, player)
                         r = requests.post('https://slack.com/api/chat.postMessage', params=message_request)

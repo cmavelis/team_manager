@@ -22,7 +22,7 @@ class PlayerAdmin(admin.ModelAdmin):
 
 class EventAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None,                  {'fields': ['name', 'id']}),
+        (None,                  {'fields': ['name']}),
         ('Event Details',          {'fields': ['type', 'date', ]}),
     ]
 

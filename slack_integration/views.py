@@ -216,7 +216,8 @@ def slack_interactive(request):
                     player_list = [Player.objects.get(id=msg.player_id)]
 
                 for player in player_list:
-                    for attendance in list(Attendance.objects.filter(event__in=event_list,
+                    for attendance in list(Attendance.objects.filter(player=player,
+                                                                     event__in=event_list,
                                                                      status__in=['P', 'U'],
                                                                      player__slack_user_id__isnull=False)):
                         print(player)

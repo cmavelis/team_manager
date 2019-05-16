@@ -242,13 +242,13 @@ def slack_interactive(request):
                                               as_user=True)
                     r = requests.post('https://slack.com/api/chat.update', params=message)
 
-                    return JsonResponse({
-                        'response_type': 'message',
-                        'text': '',
-                        'replace_original': True,
-                        'delete_original': True,
-                        'as_user': True,
-                    })
+                return JsonResponse({
+                    'response_type': 'message',
+                    'text': '',
+                    'replace_original': True,
+                    'delete_original': True,
+                    'as_user': True,
+                })
 
             # add response info to message object
             action_value = payload['actions'][0]['selected_option']['value']

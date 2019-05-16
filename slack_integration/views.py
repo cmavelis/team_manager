@@ -205,7 +205,7 @@ def slack_interactive(request):
                 player_list = []
                 # 0 means all pending events
                 if msg.event_id == 0:
-                    event_list = list(Event.objects.all())
+                    event_list = list(Event.objects.all().order_by('date'))
                 else:
                     event_list = [Event.objects.get(id=msg.event_id)]
                 print(event_list, "  whole event list")

@@ -201,6 +201,8 @@ def slack_interactive(request):
 
             # sending query when button is pressed
             if action_id == 'send_message':
+                event = ''
+                player_list = []
                 # 0 means all pending events
                 if msg.event_id == 0:
                     event_list = list(Event.objects.all())
@@ -223,24 +225,26 @@ def slack_interactive(request):
                         print(player)
                         message_request, _ = send_slack_event_confirm(event, player)
                         r = requests.post('https://slack.com/api/chat.postMessage', params=message_request)
+                        print('message sent to player')
 
-                    print('message sent to player')
-                    blocks = [{
-                        "type": "section",
-                        "text": {
-                            "type": "mrkdwn",
-                            "text": "You've sent a request to the following player(s) about *%s*:" % event.name
-                                    + ''.join(['\n• %s' % p.nickname for p in player_list])
-                        }
-                    }]
+                # update request text box to show what happened
+                event_text = 'All pending events' if msg.event_id == 0 else event.name
+                blocks = [{
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": "You've sent a request to the following player(s) about *%s*:" % event_text
+                                + ''.join(['\n• %s' % p.nickname for p in player_list])
+                    }
+                }]
 
-                    message = compose_message(channel=payload['container']['channel_id'],
-                                              ts=original_time_stamp,
-                                              text='Sent',
-                                              blocks=json.dumps(blocks),
-                                              user=payload['user']['id'],
-                                              as_user=True)
-                    r = requests.post('https://slack.com/api/chat.update', params=message)
+                message = compose_message(channel=payload['container']['channel_id'],
+                                          ts=original_time_stamp,
+                                          text='Sent',
+                                          blocks=json.dumps(blocks),
+                                          user=payload['user']['id'],
+                                          as_user=True)
+                r = requests.post('https://slack.com/api/chat.update', params=message)
 
                 return JsonResponse({
                     'response_type': 'message',

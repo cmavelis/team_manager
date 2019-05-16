@@ -221,7 +221,7 @@ def slack_interactive(request):
 
                     for player in player_list:
                         print(player)
-                        message_request, _ = send_slack_event_confirm(event, player, msg.id)
+                        message_request, _ = send_slack_event_confirm(event, player)
                         r = requests.post('https://slack.com/api/chat.postMessage', params=message_request)
 
                     print('message sent to player')
@@ -263,11 +263,12 @@ def slack_interactive(request):
         if block_id.startswith('event_rq_response'):
             user_input = payload['actions'][0]
             attendance_response = user_input['value']
+            event_responded_id = block_id.split('_')[-1]
             att_res_display = dict(Attendance.ATTENDANCE_TYPES)[attendance_response]
 
-            msg = get_object_or_404(InteractiveMessage, id=block_id.split('_')[-1])
+            # msg = get_object_or_404(InteractiveMessage, id=block_id.split('_')[-1])
             print('message found')
-            attendance = get_object_or_404(Attendance, event=msg.event_id,
+            attendance = get_object_or_404(Attendance, event=event_responded_id,
                                            player__slack_user_id=payload['user']['id'])
             print('attn found')
 

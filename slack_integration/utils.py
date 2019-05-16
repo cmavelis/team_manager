@@ -113,6 +113,15 @@ def give_player_event_dropdowns(channel):
                             {
                                 "text": {
                                     "type": "plain_text",
+                                    "text": "All pending events",
+                                    "emoji": True
+                                },
+                                "value": "0"
+                            }
+                        ] + [
+                            {
+                                "text": {
+                                    "type": "plain_text",
                                     "text": event.name,
                                     "emoji": True
                                 },

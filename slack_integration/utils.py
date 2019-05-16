@@ -17,6 +17,7 @@ def compose_message(channel, **kwargs):
 
 
 def send_slack_event_confirm(event, player, msg_id):
+    print(event, player)
     question_block = {
         "type": "section",
         "text": {

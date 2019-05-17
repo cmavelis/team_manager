@@ -111,7 +111,7 @@ def full_team_view(request):
     event_list = Event.objects.all().order_by('date')
     # Player's attendance, by Event
     players_info = []
-    for player in Player.objects.all():
+    for player in Player.objects.all().filter(active=True):
         new_entry = [player.nickname]
         attendance = player.attendance_set.all()
         for event in event_list:

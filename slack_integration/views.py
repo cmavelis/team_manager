@@ -223,7 +223,8 @@ def slack_interactive(request):
                     for attendance in list(Attendance.objects.filter(player=player,
                                                                      event__in=event_list,
                                                                      status__in=status_list,
-                                                                     player__slack_user_id__isnull=False)):
+                                                                     player__slack_user_id__isnull=False)
+                                           .order_by('event__date')):
                         message_request, _ = send_slack_event_confirm(attendance.event, player)
                         r = requests.post('https://slack.com/api/chat.postMessage', params=message_request)
                         print('message sent to player')

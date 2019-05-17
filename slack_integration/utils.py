@@ -16,8 +16,8 @@ def compose_message(channel, **kwargs):
     return new_message
 
 
-def send_slack_event_confirm(event, player):
-    print(event, player)
+def send_slack_event_confirm(events_to_query, player):
+    print(events_to_query, player)
     question_block = {
         "type": "section",
         "text": {
@@ -99,7 +99,7 @@ def give_player_event_dropdowns(channel):
                                     "emoji": True
                                 },
                                 "value": str(player.id)
-                            } for player in Player.objects.all()
+                            } for player in Player.objects.filter(active=True)
                         ]
                     },
                     {

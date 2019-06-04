@@ -124,6 +124,7 @@ class SlackCommandView(View):
         self.slack_user_id = payload['user_id']
         command_name = payload['command'][1:].split(' ')[0]
         self.command_args = payload['command'][1:].split(' ')[1:]
+        print(payload['command'])
         handler = getattr(self, 'handle_%s' % command_name)
         if not handler:
             return Http404

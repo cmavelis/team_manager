@@ -112,34 +112,48 @@ def slack_register(request):
 
 
 class SlackCommandView(View):
+    def __init__(self):
+        self.payload = None
+        self.slack_user_id = None
+        self.command_args = []
+        super(SlackCommandView, self).__init__()
+
     def post(self, request):
         payload = request.POST
+        self.payload = payload
+        self.slack_user_id = payload['user_id']
         command_name = payload['command'][1:].split(' ')[0]
+        self.command_args = payload['command'][1:].split(' ')[1:]
         handler = getattr(self, 'handle_%s' % command_name)
         if not handler:
             return Http404
         print('handling command: %s' % command_name)
-        return handler(payload)
+        return handler()
 
-    @staticmethod
-    def handle_event_query(payload):
-        new_ephemeral_message = give_player_event_dropdowns(channel=payload['user_id'])
+    def handle_event_query(self):
+        new_ephemeral_message = give_player_event_dropdowns(channel=self.slack_user_id)
         print(new_ephemeral_message)
         r = requests.post('https://slack.com/api/chat.postMessage', params=new_ephemeral_message)
         print(r.content)
         return HttpResponse(status=200)
 
-    @staticmethod
-    def handle_my_events(payload):
-        slack_user_id = payload['user_id']
+    def handle_my_events(self):
         try:
-            found_player = Player.objects.get(slack_user_id=slack_user_id)
+            found_player = Player.objects.get(slack_user_id=self.slack_user_id)
         except Player.DoesNotExist:
             return JsonResponse({
                 'text': 'Your web app account wasn\'t found.  '
                         'Have you registered your Slack ID yet? '
                         '\nType in: /register',
             })
+
+        if self.command_args:
+            print(self.command_args)
+            if found_player.captain_status:
+                print('captain command')
+                # try:
+                #     found_player = Player.objects.get(slack_user_id=self.slack_user_id)
+                # except Player.DoesNotExist:
 
         event_list = Event.objects.all().order_by('date')
         attendance = found_player.attendance_set.all()
@@ -191,7 +205,7 @@ class SlackInteractiveView(View):
         if not handler:
             return Http404
         print('handling command: %s' % action_name)
-        return handler(self)
+        return handler()
 
     def get_database_message(self):
         # find or create message DB entry

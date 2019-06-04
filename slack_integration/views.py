@@ -1,6 +1,7 @@
 import requests
 import json
 import logging
+import re
 
 from django.shortcuts import get_object_or_404
 from django.views import View
@@ -149,12 +150,16 @@ class SlackCommandView(View):
             })
 
         if self.command_text:
-            print(self.command_text)
             if found_player.captain_status:
                 print('captain command')
-                # try:
-                #     found_player = Player.objects.get(slack_user_id=self.slack_user_id)
-                # except Player.DoesNotExist:
+                match = re.search('@U\w*', self.command_text)
+                user_to_find = match.group()[1:]
+                try:
+                    found_player = Player.objects.get(slack_user_id=user_to_find)
+                except Player.DoesNotExist:
+                    return JsonResponse({
+                        'text': 'User not found',
+                    })
 
         event_list = Event.objects.all().order_by('date')
         attendance = found_player.attendance_set.all()

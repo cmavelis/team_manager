@@ -142,6 +142,7 @@ class SlackCommandView(View):
     def handle_my_events(self):
         try:
             found_player = Player.objects.get(slack_user_id=self.slack_user_id)
+            who_text = 'Your'
         except Player.DoesNotExist:
             return JsonResponse({
                 'text': 'Your web app account wasn\'t found.  '
@@ -151,11 +152,11 @@ class SlackCommandView(View):
 
         if self.command_text:
             if found_player.captain_status:
-                print('captain command')
                 match = re.search('@U\w*', self.command_text)
                 user_to_find = match.group()[1:]
                 try:
                     found_player = Player.objects.get(slack_user_id=user_to_find)
+                    who_text = found_player.nickname + '\'s'
                 except Player.DoesNotExist:
                     return JsonResponse({
                         'text': 'User not found',
@@ -180,7 +181,7 @@ class SlackCommandView(View):
 
         # TODO: add an option for editing responses attached to this message
         response = {
-            'text': 'Your event responses:',
+            'text': '%s event responses:' % who_text,
             'attachments': [
                 {'text': attachment_text}
             ]

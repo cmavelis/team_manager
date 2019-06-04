@@ -115,7 +115,7 @@ class SlackCommandView(View):
     def __init__(self):
         self.payload = None
         self.slack_user_id = None
-        self.command_args = []
+        self.command_text = None
         super(SlackCommandView, self).__init__()
 
     def post(self, request):
@@ -123,7 +123,7 @@ class SlackCommandView(View):
         self.payload = payload
         self.slack_user_id = payload['user_id']
         command_name = payload['command'][1:].split(' ')[0]
-        self.command_args = payload['command'][1:].split(' ')[1:]
+        self.command_text = payload['text']
         print(payload['command'])
         handler = getattr(self, 'handle_%s' % command_name)
         if not handler:
@@ -148,8 +148,8 @@ class SlackCommandView(View):
                         '\nType in: /register',
             })
 
-        if self.command_args:
-            print(self.command_args)
+        if self.command_text:
+            print(self.command_text)
             if found_player.captain_status:
                 print('captain command')
                 # try:

@@ -112,34 +112,48 @@ def slack_register(request):
 
 
 class SlackCommandView(View):
+    def __init__(self):
+        self.payload = None
+        self.slack_user_id = None
+        self.command_args = []
+        super(SlackCommandView, self).__init__()
+
     def post(self, request):
         payload = request.POST
+        self.payload = payload
+        self.slack_user_id = payload['user_id']
         command_name = payload['command'][1:].split(' ')[0]
+        self.command_args = payload['command'][1:].split(' ')[1:]
         handler = getattr(self, 'handle_%s' % command_name)
         if not handler:
             return Http404
         print('handling command: %s' % command_name)
-        return handler(payload)
+        return handler()
 
-    @staticmethod
-    def handle_event_query(payload):
-        new_ephemeral_message = give_player_event_dropdowns(channel=payload['user_id'])
+    def handle_event_query(self):
+        new_ephemeral_message = give_player_event_dropdowns(channel=self.slack_user_id)
         print(new_ephemeral_message)
         r = requests.post('https://slack.com/api/chat.postMessage', params=new_ephemeral_message)
         print(r.content)
         return HttpResponse(status=200)
 
-    @staticmethod
-    def handle_my_events(payload):
-        slack_user_id = payload['user_id']
+    def handle_my_events(self):
         try:
-            found_player = Player.objects.get(slack_user_id=slack_user_id)
+            found_player = Player.objects.get(slack_user_id=self.slack_user_id)
         except Player.DoesNotExist:
             return JsonResponse({
                 'text': 'Your web app account wasn\'t found.  '
                         'Have you registered your Slack ID yet? '
                         '\nType in: /register',
             })
+
+        if self.command_args:
+            print(self.command_args)
+            if found_player.captain_status:
+                print('captain command')
+                # try:
+                #     found_player = Player.objects.get(slack_user_id=self.slack_user_id)
+                # except Player.DoesNotExist:
 
         event_list = Event.objects.all().order_by('date')
         attendance = found_player.attendance_set.all()
@@ -169,132 +183,136 @@ class SlackCommandView(View):
         return JsonResponse(response)
 
 
-@csrf_exempt
-def slack_interactive(request):
-    if request.method == 'POST':
-        payload = json.loads(request.POST['payload'])
-    else:
-        return Http404
-    print(payload)
-    response = {
-        'text': 'Interactive action received',
-        'attachments': [
-            {
-                'text': 'Sent by {}'.format(payload['user']['username'])
-            }
-        ]
-    }
+class SlackInteractiveView(View):
+    def __init__(self):
+        self.payload = None
+        self.original_time_stamp = None
+        self.action_id = None
+        self.action_detail = None
+        super(SlackInteractiveView, self).__init__()
 
-    if payload['type'] == 'block_actions':
-        original_time_stamp = payload['container']['message_ts']
-        block_id = payload['actions'][0]['block_id']
+    def post(self, request):
+        self.payload = request.POST
+        self.original_time_stamp = self.payload['container']['message_ts']
+        self.action_id = self.payload['actions'][0]['action_id']
 
-        # event request dropdowns handling
-        if block_id.startswith('event_rq_dropdowns'):
-            # find or create message DB entry
-            try:
-                msg = InteractiveMessage.objects.get(slack_message_ts=original_time_stamp)
-            except InteractiveMessage.DoesNotExist:
-                msg = InteractiveMessage.objects.create(slack_message_ts=original_time_stamp)
+        block_id = self.payload['actions'][0]['block_id']
+        # block id looks like this: 'action_name_here_then-detail'
+        action_name = block_id.split('-')[0]
+        self.action_detail = block_id.split('-')[-1]
 
-            action_id = payload['actions'][0]['action_id']
+        handler = getattr(self, 'handle_%s' % action_name)
+        if not handler:
+            return Http404
+        print('handling command: %s' % action_name)
+        return handler()
 
-            # sending query when button is pressed
-            if action_id == 'send_message':
-                messaged_list = set()
-                status_list = ['P', 'Y', 'N', 'U']
-                # 0 means all pending events
-                if msg.event_id == 0:
-                    event_list = list(Event.objects.all().order_by('date'))
-                    status_list = ['P', 'U']
-                else:
-                    event_list = [Event.objects.get(id=msg.event_id)]
-                print(event_list, "  whole event list")
+    def get_database_message(self):
+        # find or create message DB entry
+        try:
+            return InteractiveMessage.objects.get(slack_message_ts=self.original_time_stamp)
+        except InteractiveMessage.DoesNotExist:
+            return InteractiveMessage.objects.create(slack_message_ts=self.original_time_stamp)
 
-                # 0 means all pending players
-                if msg.player_id == 0:
-                    player_list = list(Player.objects.all())
-                    status_list = ['P', 'U']
-                else:
-                    player_list = [Player.objects.get(id=msg.player_id)]
+    def handle_event_rq_dropdowns_select(self):
+        # add selected player or event info to message object
+        action_value = self.payload['actions'][0]['selected_option']['value']
+        msg = self.get_database_message()
 
-                for player in player_list:
-                    print(player)
-                    for attendance in list(Attendance.objects.filter(player=player,
-                                                                     event__in=event_list,
-                                                                     status__in=status_list,
-                                                                     player__slack_user_id__isnull=False)
+        if self.action_id == 'player_id':
+            msg.player_id = action_value
+            msg.save()
+        elif self.action_id == 'event_id':
+            msg.event_id = action_value
+            msg.save()
+
+        return HttpResponse(status=200)
+
+    def handle_event_rq_dropdowns_send(self):
+        msg = self.get_database_message()
+
+        messaged_list = set()
+        status_list = ['P', 'Y', 'N', 'U']
+        # 0 means all pending events
+        if msg.event_id == 0:
+            event_list = list(Event.objects.all().order_by('date'))
+            status_list = ['P', 'U']
+        else:
+            event_list = [Event.objects.get(id=msg.event_id)]
+        print(event_list, "  whole event list")
+
+        # 0 means all pending players
+        if msg.player_id == 0:
+            player_list = list(Player.objects.all())
+            status_list = ['P', 'U']
+        else:
+            player_list = [Player.objects.get(id=msg.player_id)]
+
+        for player in player_list:
+            print(player)
+            for attendance in list(Attendance.objects.filter(player=player,
+                                                             event__in=event_list,
+                                                             status__in=status_list,
+                                                             player__slack_user_id__isnull=False)
                                            .order_by('event__date')):
-                        message_request, _ = send_slack_event_confirm(attendance.event, player)
-                        r = requests.post('https://slack.com/api/chat.postMessage', params=message_request)
-                        print('message sent to player')
-                        messaged_list.add(player)
+                message_request, _ = send_slack_event_confirm(attendance.event, player)
+                r = requests.post('https://slack.com/api/chat.postMessage', params=message_request)
+                print('message sent to player')
+                messaged_list.add(player)
 
-                # update request text box to show what happened
-                event_text = 'All pending events' if msg.event_id == 0 else event_list[0].name
-                blocks = [{
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": "You've sent a request to the following player(s) about *%s*:" % event_text
-                                + ''.join(['\n• %s' % p.nickname for p in messaged_list])
-                    }
-                }]
+        # update request text box to show what happened
+        event_text = 'All pending events' if msg.event_id == 0 else event_list[0].name
+        blocks = [{
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "You've sent a request to the following player(s) about *%s*:" % event_text
+                        + ''.join(['\n• %s' % p.nickname for p in player_list])
+            }
+        }]
 
-                message = compose_message(channel=payload['container']['channel_id'],
-                                          ts=original_time_stamp,
-                                          text='Sent',
-                                          blocks=json.dumps(blocks),
-                                          user=payload['user']['id'],
-                                          as_user=True)
-                r = requests.post('https://slack.com/api/chat.update', params=message)
+        message = compose_message(channel=self.payload['container']['channel_id'],
+                                  ts=self.original_time_stamp,
+                                  text='Sent',
+                                  blocks=json.dumps(blocks),
+                                  user=self.payload['user']['id'],
+                                  as_user=True)
+        r = requests.post('https://slack.com/api/chat.update', params=message)
 
-                return JsonResponse({
-                    'response_type': 'message',
-                    'text': '',
-                    'replace_original': True,
-                    'delete_original': True,
-                    'as_user': True,
-                })
+        return JsonResponse({
+            'response_type': 'message',
+            'text': '',
+            'replace_original': True,
+            'delete_original': True,
+            'as_user': True,
+        })
 
-            # add response info to message object
-            action_value = payload['actions'][0]['selected_option']['value']
-            if action_id == 'player_id':
-                msg.player_id = action_value
-                msg.save()
-            elif action_id == 'event_id':
-                msg.event_id = action_value
-                msg.save()
+    def handle_event_rq_response(self):
+        attendance_response = self.payload['actions'][0]['value']
+        event_id = self.action_detail
+        att_res_display = dict(Attendance.ATTENDANCE_TYPES)[attendance_response]
 
-        # handling response back from player
-        if block_id.startswith('event_rq_response'):
-            user_input = payload['actions'][0]
-            attendance_response = user_input['value']
-            event_responded_id = block_id.split('_')[-1]
-            att_res_display = dict(Attendance.ATTENDANCE_TYPES)[attendance_response]
+        # msg = get_object_or_404(InteractiveMessage, id=block_id.split('_')[-1])
+        # print('message found')
+        attendance = get_object_or_404(Attendance, event=event_id,
+                                       player__slack_user_id=self.payload['user']['id'])
+        print('attendance found')
 
-            # msg = get_object_or_404(InteractiveMessage, id=block_id.split('_')[-1])
-            print('message found')
-            attendance = get_object_or_404(Attendance, event=event_responded_id,
-                                           player__slack_user_id=payload['user']['id'])
-            print('attn found')
+        # attempting to update attendance database entry
+        attendance.status = attendance_response
+        attendance.save()
+        blocks = [{
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "Your response has been recorded as *%s*, thanks!" % att_res_display
+            }
+        }]
 
-            # attempting to update attendance database entry
-            attendance.status = attendance_response
-            attendance.save()
-            blocks = [{
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": "Your response has been recorded as *%s*, thanks!" % att_res_display
-                }
-            }]
-
-            message = compose_message(payload['container']['channel_id'],
-                                      text='Succeeded',
-                                      ts=original_time_stamp,
-                                      blocks=json.dumps(blocks))
-            r = requests.post('https://slack.com/api/chat.update', params=message)
-            print(r.content)
-
-    return JsonResponse(response)
+        message = compose_message(self.payload['container']['channel_id'],
+                                  text='Succeeded',
+                                  ts=self.original_time_stamp,
+                                  blocks=json.dumps(blocks))
+        r = requests.post('https://slack.com/api/chat.update', params=message)
+        print(r.content)
+        return HttpResponse(status=200)

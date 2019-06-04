@@ -1,7 +1,15 @@
 import json
+import enum
+from enum import Enum
 
 from team.models import Event, Player, Attendance
 from team_manager import settings
+
+
+class InteractiveAction(Enum):
+    event_rq_dropdowns_select = enum.auto()
+    event_rq_dropdowns_send = enum.auto()
+    event_rq_response = enum.auto()
 
 
 def compose_message(channel, **kwargs):
@@ -36,7 +44,7 @@ def send_slack_event_confirm(event, player):
             question_block,
             {
                 "type": "actions",
-                "block_id": "event_rq_response_" + str(event.id),
+                "block_id": InteractiveAction.event_rq_response.name + "-" + str(event.id),
                 "elements": [
                     {
                         "type": "button",
@@ -56,7 +64,6 @@ def send_slack_event_confirm(event, player):
 
 
 def give_player_event_dropdowns(channel):
-    block_id = "event_rq_dropdowns"
     message = {
         "token": settings.SLACK_BOT_USER_TOKEN,
         "channel": channel,
@@ -72,7 +79,7 @@ def give_player_event_dropdowns(channel):
             },
             {
                 "type": "actions",
-                "block_id": block_id + "_select",
+                "block_id": InteractiveAction.event_rq_dropdowns_select.name,
                 "elements": [
                     {
                         "type": "static_select",
@@ -134,7 +141,7 @@ def give_player_event_dropdowns(channel):
             },
             {
                 "type": "actions",
-                "block_id": block_id + "_send",
+                "block_id": InteractiveAction.event_rq_dropdowns_send.name,
                 "elements": [
                     {
                         "type": "button",

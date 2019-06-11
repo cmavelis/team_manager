@@ -200,6 +200,7 @@ class SlackInteractiveView(View):
 
     def post(self, request):
         self.payload = request.POST
+        print(self.payload)
         self.original_time_stamp = self.payload['container']['message_ts']
         self.action_id = self.payload['actions'][0]['action_id']
 

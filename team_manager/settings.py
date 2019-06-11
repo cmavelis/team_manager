@@ -191,6 +191,7 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = os.environ.get('GMAIL_USERNAME')
 EMAIL_HOST_PASSWORD = os.environ.get('GMAIL_PASSWORD')
+EMAIL_DEFAULT_NOTIFICATION_ADDRESS = 'cmavelis+bench-app@gmail.com'
 
 
 SITE_ID = 1

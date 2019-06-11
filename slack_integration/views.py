@@ -3,11 +3,11 @@ import json
 import logging
 import re
 
+from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonResponse
-from django.utils.decorators import method_decorator
 
 from .slack_messages import create_event
 from .utils import send_slack_event_confirm, give_player_event_dropdowns, compose_message
@@ -322,4 +322,14 @@ class SlackInteractiveView(View):
                                   blocks=json.dumps(blocks))
         r = requests.post('https://slack.com/api/chat.update', params=message)
         print(r.content)
+
+        subject = 'A player has responded'
+        from_email = settings.EMAIL_HOST_USER
+        message = '%s has responded to %s with the response: %s' % (attendance.player.nickname,
+                                                                    attendance.event.name,
+                                                                    att_res_display)
+        recipients = [settings.EMAIL_DEFAULT_NOTIFICATION_ADDRESS]
+
+        send_mail(subject, message, from_email, recipients)
+
         return HttpResponse(status=200)

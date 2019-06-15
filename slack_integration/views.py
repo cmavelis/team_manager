@@ -232,15 +232,10 @@ def slack_interactive(request):
                             continue
 
                     events_to_query = list(Event.objects.filter(attendance__in=attendance_to_query).order_by('date'))
-                    print('EVENT LIST')
-                    print(event_list)
-                    print('EVENTS TO QUERY')
-                    print(events_to_query)
 
                     message_request, _ = send_slack_event_confirm(events_to_query, player)
-                    # r = requests.post('https://slack.com/api/chat.postMessage', params=message_request) # TODO: re-enable message send
+                    r = requests.post('https://slack.com/api/chat.postMessage', params=message_request)
                     print('message sent to %s' % player.nickname)
-                    print(message_request)
                     messaged_player_names.append(player.nickname)
 
                 # update request text box to show what happened

@@ -206,7 +206,7 @@ def slack_interactive(request):
                     players_to_message = [Player.objects.filter(slack_user_id__isnull=False)]
                     filter_by_response = True
                 else:
-                    players_to_message = [Player.objects.get(id=msg.player_id)]
+                    players_to_message = [get_object_or_404(Player, id=msg.player_id)]
 
                 # 0 means all pending events
                 if msg.event_id == 0:
@@ -214,8 +214,8 @@ def slack_interactive(request):
                     event_text = 'All pending events'
                     filter_by_response = True
                 else:
-                    event_list = [Event.objects.get(id=msg.event_id)]
-                    event_text = Event.objects.get(id=msg.event_id).name
+                    event_list = [get_object_or_404(Event, id=msg.event_id)]
+                    event_text = get_object_or_404(Event, id=msg.event_id).name
                 print(event_list, "  whole event list")
 
                 messaged_player_names = []
@@ -229,7 +229,7 @@ def slack_interactive(request):
                             print('message not sent to %s' % player.nickname)
                             continue
 
-                    events_to_query = [Event.objects.filter(attendance__in=attendance_to_query).order_by('date')]
+                    events_to_query = list(Event.objects.filter(attendance__in=attendance_to_query).order_by('date'))
                     print('EVENT LIST')
                     print(event_list)
                     print('EVENTS TO QUERY')

@@ -203,7 +203,7 @@ def slack_interactive(request):
             if action_id == 'send_message':
                 filter_by_response = False
                 if msg.player_id == 0:
-                    players_to_message = [Player.objects.filter(slack_user_id__isnull=False)]
+                    players_to_message = list(Player.objects.filter(slack_user_id__isnull=False))
                     filter_by_response = True
                 else:
                     players_to_message = [get_object_or_404(Player, id=msg.player_id)]

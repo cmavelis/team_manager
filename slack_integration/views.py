@@ -224,9 +224,9 @@ def slack_interactive(request):
                     attendance_to_query = Attendance.objects.filter(player=player, event__in=event_list)
 
                     if filter_by_response:
-                        print(attendance_to_query)
+                        print([attendance_to_query])
                         attendance_to_query = attendance_to_query.filter(status__in=['P', 'U'])
-                        print(attendance_to_query)
+                        print([attendance_to_query])
                         if attendance_to_query.count() == 0:
                             print('message not sent to %s' % player.nickname)
                             continue

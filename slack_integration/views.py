@@ -10,7 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonResponse
 
 from .slack_messages import create_event
-from .utils import send_slack_event_confirm, give_player_event_dropdowns, compose_message
+from .utils import send_slack_event_confirm, give_player_event_dropdowns, compose_message, replace_blocks_in_message
 from team.models import Event, Player, Attendance
 from users.models import AppUser
 from team_manager import settings
@@ -196,6 +196,7 @@ class SlackInteractiveView(View):
         self.original_time_stamp = None
         self.action_id = None
         self.action_detail = None
+        self.block_id = None
         super(SlackInteractiveView, self).__init__()
 
     def post(self, request):
@@ -203,10 +204,10 @@ class SlackInteractiveView(View):
         self.original_time_stamp = self.payload['container']['message_ts']
         self.action_id = self.payload['actions'][0]['action_id']
 
-        block_id = self.payload['actions'][0]['block_id']
+        self.block_id = self.payload['actions'][0]['block_id']
         # block id looks like this: 'action_name_here_then-detail'
-        action_name = block_id.split('-')[0]
-        self.action_detail = block_id.split('-')[-1]
+        action_name = self.block_id.split('-')[0]
+        self.action_detail = self.block_id.split('-')[-1]
 
         handler = getattr(self, 'handle_%s' % action_name)
         if not handler:
@@ -237,44 +238,49 @@ class SlackInteractiveView(View):
 
     def handle_event_rq_dropdowns_send(self):
         msg = self.get_database_message()
+        filter_by_response = False
+        if msg.player_id == 0:
+            players_to_message = list(Player.objects.filter(slack_user_id__isnull=False))
+            filter_by_response = True
+        else:
+            players_to_message = [get_object_or_404(Player, id=msg.player_id)]
 
-        messaged_list = set()
-        status_list = ['P', 'Y', 'N', 'U']
         # 0 means all pending events
         if msg.event_id == 0:
-            event_list = list(Event.objects.all().order_by('date'))
-            status_list = ['P', 'U']
+            event_list = list(Event.objects.all())#.order_by('date'))  # TODO add a "this season" or "future" filter
+            event_text = 'All pending events'
+            filter_by_response = True
         else:
-            event_list = [Event.objects.get(id=msg.event_id)]
+            event_list = [get_object_or_404(Event, id=msg.event_id)]
+            event_text = get_object_or_404(Event, id=msg.event_id).name
         print(event_list, "  whole event list")
 
-        # 0 means all pending players
-        if msg.player_id == 0:
-            player_list = list(Player.objects.all())
-            status_list = ['P', 'U']
-        else:
-            player_list = [Player.objects.get(id=msg.player_id)]
+        messaged_player_names = []
+        for player in players_to_message:
+            attendance_to_query = Attendance.objects.filter(player=player, event__in=event_list)
 
-        for player in player_list:
-            print(player)
-            for attendance in list(Attendance.objects.filter(player=player,
-                                                             event__in=event_list,
-                                                             status__in=status_list,
-                                                             player__slack_user_id__isnull=False)
-                                           .order_by('event__date')):
-                message_request, _ = send_slack_event_confirm(attendance.event, player)
-                r = requests.post('https://slack.com/api/chat.postMessage', params=message_request)
-                print('message sent to player')
-                messaged_list.add(player)
+            if filter_by_response:
+                print([attendance_to_query])
+                attendance_to_query = attendance_to_query.filter(status__in=['P', 'U'])
+                print([attendance_to_query])
+                if attendance_to_query.count() == 0:
+                    print('message not sent to %s' % player.nickname)
+                    continue
+
+            events_to_query = list(Event.objects.filter(attendance__in=attendance_to_query).order_by('date'))
+
+            message_request, _ = send_slack_event_confirm(events_to_query, player)
+            r = requests.post('https://slack.com/api/chat.postMessage', params=message_request)
+            print('message sent to %s' % player.nickname)
+            messaged_player_names.append(player.nickname)
 
         # update request text box to show what happened
-        event_text = 'All pending events' if msg.event_id == 0 else event_list[0].name
         blocks = [{
             "type": "section",
             "text": {
                 "type": "mrkdwn",
                 "text": "You've sent a request to the following player(s) about *%s*:" % event_text
-                        + ''.join(['\n• %s' % p.nickname for p in player_list])
+                        + ''.join(['\n• %s' % name for name in messaged_player_names])
             }
         }]
 
@@ -308,7 +314,8 @@ class SlackInteractiveView(View):
         # attempting to update attendance database entry
         attendance.status = attendance_response
         attendance.save()
-        blocks = [{
+
+        replacement_block = [{
             "type": "section",
             "text": {
                 "type": "mrkdwn",
@@ -316,10 +323,14 @@ class SlackInteractiveView(View):
             }
         }]
 
+        old_message_blocks = self.payload['message']['blocks']
+
+        new_message_blocks = replace_blocks_in_message(old_message_blocks, self.block_id, replacement_block)
+
         message = compose_message(self.payload['container']['channel_id'],
                                   text='Succeeded',
                                   ts=self.original_time_stamp,
-                                  blocks=json.dumps(blocks))
+                                  blocks=json.dumps(new_message_blocks))
         r = requests.post('https://slack.com/api/chat.update', params=message)
         print(r.content)
 

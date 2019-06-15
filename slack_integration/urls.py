@@ -6,7 +6,7 @@ from . import views
 app_name = 'slack_integration'
 urlpatterns = [
     # slack/interactive/  slack interactive message endpoint
-    path('interactive/', views.slack_interactive, name='slack_interactive'),
+    path('interactive/', csrf_exempt(views.SlackInteractiveView.as_view()), name='slack_interactive'),
 
     # slack/commands/  slack slash commands endpoint
     path('commands/', csrf_exempt(views.SlackCommandView.as_view()), name='slack_commands'),

@@ -1,4 +1,5 @@
 import json
+from typing import List
 
 from team.models import Event, Player, Attendance
 from team_manager import settings
@@ -16,43 +17,59 @@ def compose_message(channel, **kwargs):
     return new_message
 
 
-def send_slack_event_confirm(event, player):
-    print(event, player)
-    question_block = {
+def compose_event_blocks(event):
+    blocks = [
+        {
+            "type": "divider"
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "*%s*, %s" % (event.name, event.date.strftime('%B %d %Y'))
+            }
+        },
+        {
+            "type": "actions",
+            "block_id": "event_rq_response-" + str(event.id),
+            "elements": [
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": str(allowed_response[1]),
+                        "emoji": True
+                    },
+                    "value": str(allowed_response[0])
+                } for allowed_response in Attendance.ATTENDANCE_TYPES if allowed_response[0] != 'P'
+            ]
+        }
+    ]
+
+    return blocks
+
+
+def send_slack_event_confirm(events_to_query, player):
+    print(events_to_query, player)
+    header_block = {
         "type": "section",
         "text": {
             "type": "mrkdwn",
-            "text": "Your response has been requested for the event: *%s*\n"
-                    "It's on %s.  Can you make it?" % (event.name, event.date.strftime('%B %d %Y'))
+            "text": "Your response has been requested for the following events.  Can you make it?"
         }
     }
+
+    event_blocks = [block for event in events_to_query for block in compose_event_blocks(event)]
 
     message = {
         "token": settings.SLACK_BOT_USER_TOKEN,
         "channel": player.slack_user_id,
         "as_user": True,
         "text": "Your response has been requested",
-        "blocks": json.dumps([
-            question_block,
-            {
-                "type": "actions",
-                "block_id": "event_rq_response_" + str(event.id),
-                "elements": [
-                    {
-                        "type": "button",
-                        "text": {
-                            "type": "plain_text",
-                            "text": str(allowed_response[1]),
-                            "emoji": True
-                        },
-                        "value": str(allowed_response[0])
-                    } for allowed_response in Attendance.ATTENDANCE_TYPES if allowed_response[0] != 'P'
-                ]
-            }
-        ])
+        "blocks": json.dumps([header_block] + event_blocks)
     }
 
-    return message, question_block
+    return message, header_block
 
 
 def give_player_event_dropdowns(channel):
@@ -99,7 +116,7 @@ def give_player_event_dropdowns(channel):
                                     "emoji": True
                                 },
                                 "value": str(player.id)
-                            } for player in Player.objects.all()
+                            } for player in Player.objects.filter(active=True)
                         ]
                     },
                     {
@@ -153,3 +170,23 @@ def give_player_event_dropdowns(channel):
     }
 
     return message
+
+
+def replace_blocks_in_message(original_message_blocks: List[dict], block_id: str,
+                              replacement_blocks: List[dict])-> List[dict]:
+    """
+    :param original_message_blocks: list of block dicts for the message to be edited
+    :param block_id: block id from slack
+    :param replacement_blocks: list of blocks to replace the block with provided id
+    :return: new message, a list of blocks
+    """
+    new_message = []
+    for i in range(len(original_message_blocks)):
+        if original_message_blocks[i]['block_id'] == block_id:
+            for block in replacement_blocks:
+                new_message.append(block)
+        else:
+            new_message.append(original_message_blocks[i])
+
+    return new_message
+

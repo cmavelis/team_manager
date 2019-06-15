@@ -199,7 +199,7 @@ def slack_interactive(request):
 
             action_id = payload['actions'][0]['action_id']
 
-            # sending query when button is pressed
+            # sending query when button is pressed #############################
             if action_id == 'send_message':
                 filter_by_response = False
                 if msg.player_id == 0:

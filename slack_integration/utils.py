@@ -16,43 +16,59 @@ def compose_message(channel, **kwargs):
     return new_message
 
 
+def compose_event_blocks(event):
+    blocks = [
+        {
+            "type": "divider"
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "*%s*, %s" % (event.name, event.date.strftime('%B %d %Y'))
+            }
+        },
+        {
+            "type": "actions",
+            "block_id": "event_rq_response_" + str(event.id),
+            "elements": [
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": str(allowed_response[1]),
+                        "emoji": True
+                    },
+                    "value": str(allowed_response[0])
+                } for allowed_response in Attendance.ATTENDANCE_TYPES if allowed_response[0] != 'P'
+            ]
+        }
+    ]
+
+    return blocks
+
+
 def send_slack_event_confirm(events_to_query, player):
     print(events_to_query, player)
-    question_block = {
+    header_block = {
         "type": "section",
         "text": {
             "type": "mrkdwn",
-            "text": "Your response has been requested for the event: *%s*\n"
-                    "It's on %s.  Can you make it?" % (event.name, event.date.strftime('%B %d %Y'))
+            "text": "Your response has been requested for the following events.  Can you make it?"
         }
     }
+
+    event_blocks = [block for event in events_to_query for block in compose_event_blocks(event)]
 
     message = {
         "token": settings.SLACK_BOT_USER_TOKEN,
         "channel": player.slack_user_id,
         "as_user": True,
         "text": "Your response has been requested",
-        "blocks": json.dumps([
-            question_block,
-            {
-                "type": "actions",
-                "block_id": "event_rq_response_" + str(event.id),
-                "elements": [
-                    {
-                        "type": "button",
-                        "text": {
-                            "type": "plain_text",
-                            "text": str(allowed_response[1]),
-                            "emoji": True
-                        },
-                        "value": str(allowed_response[0])
-                    } for allowed_response in Attendance.ATTENDANCE_TYPES if allowed_response[0] != 'P'
-                ]
-            }
-        ])
+        "blocks": json.dumps([header_block] + event_blocks)
     }
 
-    return message, question_block
+    return message, header_block
 
 
 def give_player_event_dropdowns(channel):

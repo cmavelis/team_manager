@@ -1,4 +1,5 @@
 import json
+from typing import List
 
 from team.models import Event, Player, Attendance
 from team_manager import settings
@@ -169,3 +170,23 @@ def give_player_event_dropdowns(channel):
     }
 
     return message
+
+
+def replace_blocks_in_message(original_message_blocks: List[dict], block_id: str,
+                              replacement_blocks: List[dict])-> List[dict]:
+    """
+    :param original_message_blocks: list of block dicts for the message to be edited
+    :param block_id: block id from slack
+    :param replacement_blocks: list of blocks to replace the block with provided id
+    :return: new message, a list of blocks
+    """
+    new_message = []
+    for i in range(len(original_message_blocks)):
+        if original_message_blocks[i]['block_id'] == block_id:
+            for block in replacement_blocks:
+                new_message.append(block)
+        else:
+            new_message.append(original_message_blocks[i])
+
+    return new_message
+

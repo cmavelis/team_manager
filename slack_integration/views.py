@@ -9,7 +9,7 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonRespons
 from django.utils.decorators import method_decorator
 
 from .slack_messages import create_event
-from .utils import send_slack_event_confirm, give_player_event_dropdowns, compose_message
+from .utils import send_slack_event_confirm, give_player_event_dropdowns, compose_message, replace_blocks_in_message
 from team.models import Event, Player, Attendance
 from users.models import AppUser
 from team_manager import settings
@@ -218,18 +218,23 @@ def slack_interactive(request):
                     event_text = Event.objects.get(id=msg.event_id).name
                 print(event_list, "  whole event list")
 
+                messaged_player_names = []
                 for player in players_to_message:
                     print(player)
                     attendance_to_query = Attendance.objects.filter(player=player, event__in=event_list)
 
                     if filter_by_response:
                         attendance_to_query = attendance_to_query.filter(status__in=['P', 'U'])
+                        if attendance_to_query.count() == 0:
+                            print('message not sent to %s' % player.nickname)
+                            continue
 
                     events_to_query = [Event.objects.filter(attendance__in=attendance_to_query).order_by('date')]
 
                     message_request, _ = send_slack_event_confirm(events_to_query, player)
-                    # r = requests.post('https://slack.com/api/chat.postMessage', params=message_request)  TODO: re-enable message send
-                    print('message sent to player')
+                    # r = requests.post('https://slack.com/api/chat.postMessage', params=message_request) # TODO: re-enable message send
+                    print('message sent to %s' % player.nickname)
+                    messaged_player_names.append(player.nickname)
 
                 # update request text box to show what happened
                 blocks = [{
@@ -237,7 +242,7 @@ def slack_interactive(request):
                     "text": {
                         "type": "mrkdwn",
                         "text": "You've sent a request to the following player(s) about *%s*:" % event_text
-                                + ''.join(['\n• %s' % p.nickname for p in players_to_message])
+                                + ''.join(['\n• %s' % name for name in messaged_player_names])
                     }
                 }]
 
@@ -281,8 +286,10 @@ def slack_interactive(request):
 
             # attempting to update attendance database entry
             attendance.status = attendance_response
+            # TODO: get message from payload, use event responded ID to get block, then replace the "actions" block
             attendance.save()
-            blocks = [{
+
+            replacement_block = [{
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
@@ -290,10 +297,14 @@ def slack_interactive(request):
                 }
             }]
 
+            old_message_blocks = payload['message']['blocks']
+
+            new_message_blocks = replace_blocks_in_message(old_message_blocks, block_id, replacement_block)
+
             message = compose_message(payload['container']['channel_id'],
                                       text='Succeeded',
                                       ts=original_time_stamp,
-                                      blocks=json.dumps(blocks))
+                                      blocks=json.dumps(new_message_blocks))
             r = requests.post('https://slack.com/api/chat.update', params=message)
             print(r.content)
 

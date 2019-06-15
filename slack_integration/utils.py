@@ -31,7 +31,7 @@ def compose_event_blocks(event):
         },
         {
             "type": "actions",
-            "block_id": "event_rq_response_" + str(event.id),
+            "block_id": "event_rq_response-" + str(event.id),
             "elements": [
                 {
                     "type": "button",

@@ -196,6 +196,7 @@ class SlackInteractiveView(View):
         self.original_time_stamp = None
         self.action_id = None
         self.action_detail = None
+        self.block_id = None
         super(SlackInteractiveView, self).__init__()
 
     def post(self, request):
@@ -203,10 +204,10 @@ class SlackInteractiveView(View):
         self.original_time_stamp = self.payload['container']['message_ts']
         self.action_id = self.payload['actions'][0]['action_id']
 
-        block_id = self.payload['actions'][0]['block_id']
+        self.block_id = self.payload['actions'][0]['block_id']
         # block id looks like this: 'action_name_here_then-detail'
-        action_name = block_id.split('-')[0]
-        self.action_detail = block_id.split('-')[-1]
+        action_name = self.block_id.split('-')[0]
+        self.action_detail = self.block_id.split('-')[-1]
 
         handler = getattr(self, 'handle_%s' % action_name)
         if not handler:
@@ -324,7 +325,7 @@ class SlackInteractiveView(View):
 
         old_message_blocks = self.payload['message']['blocks']
 
-        new_message_blocks = replace_blocks_in_message(old_message_blocks, block_id, replacement_block)
+        new_message_blocks = replace_blocks_in_message(old_message_blocks, self.block_id, replacement_block)
 
         message = compose_message(self.payload['container']['channel_id'],
                                   text='Succeeded',

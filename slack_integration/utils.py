@@ -123,7 +123,7 @@ def give_player_event_dropdowns(channel):
                                     "emoji": True
                                 },
                                 "value": str(player.id)
-                            } for player in Player.objects.filter(active=True)
+                            } for player in Player.objects.filter(active=True).order_by('nickname')
                         ]
                     },
                     {
@@ -151,7 +151,7 @@ def give_player_event_dropdowns(channel):
                                     "emoji": True
                                 },
                                 "value": str(event.id)
-                            } for event in Event.objects.all()
+                            } for event in Event.this_season.all()
                         ]
                     }
                 ]

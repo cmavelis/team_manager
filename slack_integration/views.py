@@ -162,7 +162,7 @@ class SlackCommandView(View):
                         'text': 'User not found',
                     })
 
-        event_list = Event.objects.all().order_by('date')
+        event_list = Event.this_season.all()
         attendance = found_player.attendance_set.all()
         attendance_entries = []
         for event in event_list:
@@ -247,7 +247,7 @@ class SlackInteractiveView(View):
 
         # 0 means all pending events
         if msg.event_id == 0:
-            event_list = list(Event.objects.all())#.order_by('date'))  # TODO add a "this season" or "future" filter
+            event_list = list(Event.this_season.all())
             event_text = 'All pending events'
             filter_by_response = True
         else:
@@ -267,7 +267,7 @@ class SlackInteractiveView(View):
                     print('message not sent to %s' % player.nickname)
                     continue
 
-            events_to_query = list(Event.objects.filter(attendance__in=attendance_to_query).order_by('date'))
+            events_to_query = list(Event.this_season.filter(attendance__in=attendance_to_query))
 
             message_request, _ = send_slack_event_confirm(events_to_query, player)
             r = requests.post('https://slack.com/api/chat.postMessage', params=message_request)

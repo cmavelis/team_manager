@@ -108,10 +108,10 @@ def redirect_to_login(request):
 @login_required
 def full_team_view(request):
     # all Events, in order of date
-    event_list = Event.objects.all().order_by('date')
+    event_list = Event.this_season.all()
     # Player's attendance, by Event
     players_info = []
-    for player in Player.objects.all().filter(active=True):
+    for player in Player.objects.all().filter(active=True).order_by('nickname'):
         new_entry = [player.nickname]
         attendance = player.attendance_set.all()
         for event in event_list:

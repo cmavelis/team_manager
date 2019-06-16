@@ -49,6 +49,7 @@ class SlackCommandView(View):
         self.payload = None
         self.slack_user_id = None
         self.command_text = None
+        self.player_giving_command = None
         super(SlackCommandView, self).__init__()
 
     def post(self, request):
@@ -62,6 +63,17 @@ class SlackCommandView(View):
         if not handler:
             return Http404
         print('handling command: %s' % command_name)
+
+        if command_name != 'register':
+            try:
+                self.player_giving_command = Player.objects.get(slack_user_id=self.slack_user_id)
+            except Player.DoesNotExist:
+                return JsonResponse({
+                    'text': 'Your web app account wasn\'t found.  '
+                            'Have you registered your Slack ID yet? '
+                            '\nType in: /register',
+                })
+
         return handler()
 
     def handle_event_query(self):
@@ -72,18 +84,9 @@ class SlackCommandView(View):
         return HttpResponse(status=200)
 
     def handle_my_events(self):
-        try:
-            found_player = Player.objects.get(slack_user_id=self.slack_user_id)
-            who_text = 'Your'
-        except Player.DoesNotExist:
-            return JsonResponse({
-                'text': 'Your web app account wasn\'t found.  '
-                        'Have you registered your Slack ID yet? '
-                        '\nType in: /register',
-            })
-
+        who_text = 'Your'
         if self.command_text:
-            if found_player.captain_status:
+            if self.player_giving_command.captain_status:
                 match = re.search('@U\w*', self.command_text)
                 user_to_find = match.group()[1:]
                 try:
@@ -95,7 +98,7 @@ class SlackCommandView(View):
                     })
 
         event_list = Event.this_season.all()
-        attendance = found_player.attendance_set.all()
+        attendance = self.player_giving_command.attendance_set.all()
         attendance_entries = []
         for event in event_list:
             try:
@@ -158,6 +161,10 @@ class SlackCommandView(View):
         return JsonResponse(response)
 
     def handle_test_hi(self):
+        if not self.player_giving_command.captain_status:
+            return JsonResponse({
+                'text': 'This command requires captain status',
+            })
         user_info_response = requests.get('https://slack.com/api/users.info',
                                           params={'user': self.slack_user_id, 'token': settings.SLACK_BOT_USER_TOKEN}
                                           )

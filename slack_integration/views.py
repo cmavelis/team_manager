@@ -22,26 +22,6 @@ logger = logging.getLogger(__name__)
 
 
 @csrf_exempt
-def slack_test(request):
-    if request.method == 'POST':
-        payload = request.POST
-    else:
-        return Http404
-    # print(payload)
-    if payload['command'] == '/test_hi':
-        response = {
-            'text': 'Hi',
-            'attachments': [
-                {
-                    'text': 'Sent by {}'.format(payload['user_name'])
-                }
-            ]
-        }
-
-        return JsonResponse(response)
-
-
-@csrf_exempt
 def slack_create_event(request):
     if request.method == 'POST':
         payload = request.POST
@@ -174,6 +154,22 @@ class SlackCommandView(View):
             player.slack_user_id = self.slack_user_id
             player.save()
             # TODO: after creating AppUser and Player, send email with password
+
+        return JsonResponse(response)
+
+    def handle_test_hi(self):
+        user_info_response = requests.get('https://slack.com/api/users.info',
+                                          params={'user': self.slack_user_id, 'token': settings.SLACK_BOT_USER_TOKEN}
+                                          )
+        print(user_info_response.json())
+        response = {
+            'text': 'Hi',
+            'attachments': [
+                {
+                    'text': 'Sent by {}'.format(self.payload['user_name'])
+                }
+            ]
+        }
 
         return JsonResponse(response)
 

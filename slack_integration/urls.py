@@ -12,7 +12,7 @@ urlpatterns = [
     path('commands/', csrf_exempt(views.SlackCommandView.as_view()), name='slack_commands'),
 
     # slack/test/  slack test message
-    path('test/', views.slack_test, name='slack_test'),
+    path('test/', csrf_exempt(views.SlackCommandView.as_view()), name='slack_test'),
 
     # slack/create_event/  create an event from slack
     path('create_event/', views.slack_create_event, name='slack_create_event'),

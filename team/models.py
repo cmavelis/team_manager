@@ -1,7 +1,17 @@
+import datetime
+
 from django.db import models
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+
+
+class ThisSeasonEventManager(models.Manager):
+    """
+    Custom manager for our frisbee events
+    """
+    def get_queryset(self):
+        return super().get_queryset().filter(date__gte=datetime.date.today(), display_event=True).order_by('date')
 
 
 class Event(models.Model):
@@ -15,6 +25,10 @@ class Event(models.Model):
     type = models.CharField(max_length=20, choices=EVENT_TYPES)
     name = models.CharField(max_length=30, default='')
     date = models.DateField('Event date')
+    display_event = models.BooleanField(default=True)
+
+    objects = models.Manager()
+    this_season = ThisSeasonEventManager()
 
     def __str__(self):
         return self.name

@@ -64,54 +64,6 @@ def slack_create_event(request):
         return JsonResponse(create_event, safe=False)
 
 
-@csrf_exempt
-def slack_register(request):
-    if request.method == 'POST':
-        payload = request.POST
-    else:
-        return Http404
-    print(payload)
-    if payload['command'] == '/register':
-        slack_user_id = payload['user_id']
-        response = {}
-
-        # if this Slack ID is already registered, tell the user that
-        try:
-            player = Player.objects.get(slack_user_id=slack_user_id)
-            response['text'] = 'Your Slack account is already linked' \
-                               ' to the web app with the email *%s*' % player.user.email
-
-        # if this Slack ID isn't registered to an AppUser yet
-        except Player.DoesNotExist:
-            user_info_response = requests.get('https://slack.com/api/users.info',
-                                              params={'user': slack_user_id, 'token': settings.SLACK_BOT_USER_TOKEN}
-                                              )  # see https://api.slack.com/methods/users.info
-            print(user_info_response.json())
-            slack_profile = user_info_response.json()['user']['profile']
-            user_email = slack_profile['email']
-
-            # look for a user with the Slack-registered email to register with
-            try:
-                player = Player.objects.get(user__email=user_email)
-                response['text'] = 'Your Slack account has been linked' \
-                                   ' to the web app with the email *%s*' % player.user.email
-
-            # otherwise create a user and link the Slack account
-            except Player.DoesNotExist:
-                new_user = AppUser.objects.create_user(email=user_email, full_name=slack_profile['real_name'])
-                player = Player.objects.get(user=new_user)
-                response['text'] = 'A web app account has been created for you' \
-                                   ' with the email *%s* and linked to your Slack account' % player.user.email
-            player.slack_user_id = slack_user_id
-            player.save()
-            # TODO: after creating AppUser and Player, send email with password
-
-        return JsonResponse(response)
-
-    else:
-        return Http404
-
-
 class SlackCommandView(View):
     def __init__(self):
         self.payload = None
@@ -186,6 +138,42 @@ class SlackCommandView(View):
                 {'text': attachment_text}
             ]
         }
+
+        return JsonResponse(response)
+
+    def handle_register(self):
+        response = {}
+
+        # if this Slack ID is already registered, tell the user that
+        try:
+            player = Player.objects.get(slack_user_id=self.slack_user_id)
+            response['text'] = 'Your Slack account is already linked' \
+                               ' to the web app with the email *%s*' % player.user.email
+
+        # if this Slack ID isn't registered to an AppUser yet
+        except Player.DoesNotExist:
+            user_info_response = requests.get('https://slack.com/api/users.info',
+                                              params={'user': self.slack_user_id, 'token': settings.SLACK_BOT_USER_TOKEN}
+                                              )  # see https://api.slack.com/methods/users.info
+            print(user_info_response.json())
+            slack_profile = user_info_response.json()['user']['profile']
+            user_email = slack_profile['email']
+
+            # look for a user with the Slack-registered email to register with
+            try:
+                player = Player.objects.get(user__email=user_email)
+                response['text'] = 'Your Slack account has been linked' \
+                                   ' to the web app with the email *%s*' % player.user.email
+
+            # otherwise create a user and link the Slack account
+            except Player.DoesNotExist:
+                new_user = AppUser.objects.create_user(email=user_email, full_name=slack_profile['real_name'])
+                player = Player.objects.get(user=new_user)
+                response['text'] = 'A web app account has been created for you' \
+                                   ' with the email *%s* and linked to your Slack account' % player.user.email
+            player.slack_user_id = self.slack_user_id
+            player.save()
+            # TODO: after creating AppUser and Player, send email with password
 
         return JsonResponse(response)
 

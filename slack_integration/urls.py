@@ -17,6 +17,6 @@ urlpatterns = [
     # slack/create_event/  create an event from slack
     path('create_event/', views.slack_create_event, name='slack_create_event'),
 
-    # slack/register/  register slack user id to webapp account
-    path('register/', views.slack_register, name='slack_register')
+    # slack/register/  register slack user id to webapp account  # TODO: change command url in Slack
+    path('register/', csrf_exempt(views.SlackCommandView.as_view()), name='slack_register')
 ]
